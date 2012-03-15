@@ -9,15 +9,17 @@ public class TransformRect{
 	private int oLeft, oTop,
 			oWidth, oHeight;//o = original	
 	private static final int error_range = 10;//pixel
+	private int screenHeight;
 	
-	public TransformRect(int left, int top, int width, int height){
+	public TransformRect(int left, int top, int width, int height, int screenHeight){
 		this.left = oLeft = left;
 		this.top  = oTop = top;
 		this.width = oWidth = width;
 		this.height = oHeight = height;
+		this.screenHeight = screenHeight;
 	}
 	
-	public void Translate(int disX, int disY, int screenHeight){
+	public void Translate(int disX, int disY){
 		//this.left += disX;this.top += disY;
 		int newLeft = left + disX, newTop = top + disY;
 		if(newLeft <= 0 && newLeft >= (oWidth - width))
@@ -41,7 +43,7 @@ public class TransformRect{
 		}
 	}
 	
-	public void FixScale(int screenHeight){
+	public void FixScale(){
 		if(height < screenHeight){
 			left = (oWidth - width)/2;
 			top = (screenHeight - height)/2;
