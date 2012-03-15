@@ -28,6 +28,15 @@ public class TransformRect{
 			this.top = newTop;
 	}
 	
+	public float getScaled(){
+		return (float)(width)/oWidth;
+	}
+	
+	public void Reset(){
+		left = oLeft;top = oTop;
+		width = oWidth;height = oHeight;
+	}
+	
 	public void Scale(int focalPX, int focalPY, float factor){
 		float percentWidth = ((float)(focalPX - left)/width), percentHeight = ((float)(focalPY - top)/height);		
 		width = (int)Math.max(oWidth*m_MinScale, Math.min(oWidth*m_MaxScale, width*factor));

@@ -52,9 +52,10 @@ public class EntryImgView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-		if(_scaleDetector.onTouchEvent(ev) && _gestureDetector.onTouchEvent(ev))
-			return true;
-		return false;
+		_scaleDetector.onTouchEvent(ev);
+		_gestureDetector.onTouchEvent(ev);
+		return true;
+		
 	}
 	
 	
@@ -81,17 +82,21 @@ public class EntryImgView extends View {
 	private class DoubleTapListener implements GestureDetector.OnDoubleTapListener{
 
 		public boolean onDoubleTap(MotionEvent e) {
-			// TODO Auto-generated method stub
-			return false;
+			
+			if(r_img.getScaled() != 1.f)
+				r_img.Reset();				
+			else
+				r_img.Scale((int)e.getX(), (int)e.getY(), 2.f);
+			invalidate();
+			
+			return true;
 		}
 
-		public boolean onDoubleTapEvent(MotionEvent e) {
-			// TODO Auto-generated method stub
+		public boolean onDoubleTapEvent(MotionEvent e) {			
 			return false;
 		}
 
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 		
