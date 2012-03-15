@@ -1,6 +1,7 @@
 package net.knvz.android_fortest;
 
 import android.content.Context;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -10,9 +11,8 @@ import android.graphics.Canvas;
 public class EntryImgView extends View {
 	private Bitmap m_bitmap;
 	private ScaleGestureDetector _scaleDetector;
+	private GestureDetector _gestureDetector;
 	private TransformRect r_img;
-	private float prevX, prevY;
-	private int activePointerId = -1;
 	
 	public EntryImgView(Context context) {
 		super(context);
@@ -22,6 +22,8 @@ public class EntryImgView extends View {
 		this(context);
 		m_bitmap = bmp;
 		_scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+		_gestureDetector = new GestureDetector(context, new GestureListener());
+		_gestureDetector.setOnDoubleTapListener(new DoubleTapListener());
 	}
 
 	@Override
@@ -50,41 +52,9 @@ public class EntryImgView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-		_scaleDetector.onTouchEvent(ev);
-		switch(ev.getAction() & MotionEvent.ACTION_MASK){
-		case MotionEvent.ACTION_DOWN:{
-			prevX = ev.getX();prevY = ev.getY();
-			activePointerId = ev.getPointerId(0);
-			break;
-		}
-		case MotionEvent.ACTION_MOVE:{
-			int pIndex = ev.findPointerIndex(activePointerId);
-			float x = ev.getX(pIndex), y = ev.getY(pIndex);
-			if(!_scaleDetector.isInProgress()){
-				r_img.Translate((int)(x - prevX), (int)(y - prevY));
-				this.invalidate();
-			}
-			prevX = x;prevY = y;
-			break;
-		}
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_CANCEL:
-			activePointerId = -1;
-			break;
-		case MotionEvent.ACTION_POINTER_UP:{
-			int pIndex = (ev.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) 
-	                >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-	        int pId = ev.getPointerId(pIndex);
-	        if(pId == activePointerId){
-	        	int pNewIndex = (pIndex == 0) ? 1 : 0;
-	        	prevX = ev.getX(pNewIndex);
-	        	prevY = ev.getY(pNewIndex);
-	        	activePointerId = ev.getPointerId(pNewIndex);
-	        }
-			break;
-		}
-		}
-		return true;
+		if(_scaleDetector.onTouchEvent(ev) && _gestureDetector.onTouchEvent(ev))
+			return true;
+		return false;
 	}
 	
 	
@@ -104,6 +74,53 @@ public class EntryImgView extends View {
 			super.onScaleEnd(detector);
 			r_img.FixScale();
 			invalidate();			
+		}
+		
+	}
+	
+	private class DoubleTapListener implements GestureDetector.OnDoubleTapListener{
+
+		public boolean onDoubleTap(MotionEvent e) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public boolean onDoubleTapEvent(MotionEvent e) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
+	
+	private class GestureListener implements GestureDetector.OnGestureListener{
+
+		public boolean onDown(MotionEvent e) {
+			return false;
+		}
+
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
+			
+			return false;
+		}
+
+		public void onLongPress(MotionEvent e) {			
+		}
+
+		public boolean onScroll(MotionEvent e1, MotionEvent e2,
+				float distanceX, float distanceY) {
+			r_img.Translate(-(int)distanceX, -(int)distanceY);
+			invalidate();
+			return true;
+		}
+		public void onShowPress(MotionEvent e) {}
+		public boolean onSingleTapUp(MotionEvent e) {			
+			return false;
 		}
 		
 	}
