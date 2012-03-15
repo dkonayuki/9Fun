@@ -13,6 +13,7 @@ public class EntryImgView extends View {
 	private TransformRect r_img;
 	private float prevX, prevY;
 	private int activePointerId = -1;
+	private int screenHeight;
 	
 	public EntryImgView(Context context) {
 		super(context);
@@ -31,7 +32,9 @@ public class EntryImgView extends View {
 	}
 
 	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {		
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		screenHeight = h;
+		//
 		float scaleW = m_bitmap.getWidth()/w; //No handle for scaleW < 1;
 		
 		int left, top, width, height;		
@@ -61,7 +64,7 @@ public class EntryImgView extends View {
 			int pIndex = ev.findPointerIndex(activePointerId);
 			float x = ev.getX(pIndex), y = ev.getY(pIndex);
 			if(!_scaleDetector.isInProgress()){
-				r_img.Translate((int)(x - prevX), (int)(y - prevY));
+				r_img.Translate((int)(x - prevX), (int)(y - prevY), screenHeight);
 				this.invalidate();
 			}
 			prevX = x;prevY = y;
@@ -95,10 +98,15 @@ public class EntryImgView extends View {
 			float _scale = detector.getScaleFactor();
 			r_img.Scale((int)detector.getFocusX(), (int)detector.getFocusY()
 					, _scale);
-			
-			//_scale = Math.max(1.f, Math.min(_scale, 3.f));
-			invalidate();			
+			invalidate();
 			return true;
+		}
+
+		@Override
+		public void onScaleEnd(ScaleGestureDetector detector) {			
+			super.onScaleEnd(detector);
+			r_img.FixScale(screenHeight);
+			invalidate();			
 		}
 		
 	}

@@ -7,7 +7,7 @@ public class TransformRect{
 	private int left, top,
 				width, height;
 	private int oLeft, oTop,
-			oWidth, oHeight;//o = original
+			oWidth, oHeight;//o = original	
 	private static final int error_range = 10;//pixel
 	
 	public TransformRect(int left, int top, int width, int height){
@@ -17,8 +17,13 @@ public class TransformRect{
 		this.height = oHeight = height;
 	}
 	
-	public void Translate(int disX, int disY){
-		this.left += disX;this.top += disY;
+	public void Translate(int disX, int disY, int screenHeight){
+		//this.left += disX;this.top += disY;
+		int newLeft = left + disX, newTop = top + disY;
+		if(newLeft <= 0 && newLeft >= (oWidth - width))
+			this.left = newLeft;
+		if(height > screenHeight && newTop <= 0 && newTop >= (screenHeight - height))
+			this.top = newTop;
 	}
 	
 	public void Scale(int focalPX, int focalPY, float factor){
@@ -33,6 +38,13 @@ public class TransformRect{
 			left = (int) (focalPX - width*percentWidth);
 			top = (int) (focalPY - height*percentHeight);
 
+		}
+	}
+	
+	public void FixScale(int screenHeight){
+		if(height < screenHeight){
+			left = (oWidth - width)/2;
+			top = (screenHeight - height)/2;
 		}
 	}
 	
