@@ -26,23 +26,23 @@ public class NineGAG {
 		
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
-							l_trending 	= new ArrayList<GagEntry>(),
-							l_vote 		= new ArrayList<GagEntry>();
-	private int point_hot = 0, point_trending = 0;
+							l_discover 	= new ArrayList<GagEntry>();
+							
+	private int point_hot = 0, point_discover = 0;
 	private HttpClient httpclient;
 	
 	public List<GagEntry> getListHot(){return l_hot;}
-	public List<GagEntry> getListTrending(){return l_trending;}
+	public List<GagEntry> getListdiscover(){return l_discover;}
 	
 	private void updateNewEntries(EntryType type) throws ClientProtocolException, IOException{
 		HttpGet httpget;
 		switch(type){
-			case TRENDING:
-				httpget = new HttpGet(_sImg + "hot&id=" 
-										+ l_trending.get(l_trending.size() - 1).getID());
+			case DISCOVER:
+				httpget = new HttpGet(_sImg + "discover&id=" 
+										+ l_discover.get(l_discover.size() - 1).getID());
 			break;
 			default://HOT	
-				httpget = new HttpGet(_sImg + "trending&id="
+				httpget = new HttpGet(_sImg + "hot&id="
 										+ l_hot.get(l_hot.size() - 1).getID());
 			break;
 		}
@@ -54,8 +54,7 @@ public class NineGAG {
 			int i;
 			while(( i = in.read()) != -1){
 				str.append((char)i);			
-			}
-			System.out.println(str);
+			}			
 			try {
 				
 				JSONObject json = new JSONObject(str.toString());	
@@ -65,8 +64,7 @@ public class NineGAG {
 				StringBuilder strb = new StringBuilder();
 				
 				for(int j = 0; j < json_items.length(); j++)					
-					strb.append(json_items.getString("entry-" + arr.getInt(j)));
-
+					strb.append(json_items.getString("entry-" + arr.getInt(j)));				
 				produceEntriesFromString(strb.toString(), type);
 				
 			} catch (ParseException e) {				
@@ -78,13 +76,13 @@ public class NineGAG {
 	//This function must be called when touching for the next entry
 	//Because it is used for update new entries
 	public GagEntry Next(EntryType type){
-		if((l_hot.size() - point_hot) <= _iUpdate || (l_trending.size() - point_trending) <= _iUpdate )
+		if((l_hot.size() - point_hot) <= _iUpdate || (l_discover.size() - point_discover) <= _iUpdate )
 			try {
 				updateNewEntries(type);
 			} catch (Exception e) {}
 		
-		if(type == EntryType.TRENDING)			
-			return l_trending.get(point_trending++);
+		if(type == EntryType.DISCOVER)			
+			return l_discover.get(point_discover++);
 		
 		//for Default(hot)
 		return l_hot.get(point_hot++);
@@ -109,17 +107,29 @@ public class NineGAG {
 			String url = match_dataurl.group().replaceFirst("(?i)data-url=\"", "")
 					.replaceFirst("\"", "");
 			
-			if(type == EntryType.HOT)
-				l_hot.add(new GagEntry(id, name, url, EntryType.HOT));
+			//Add get link
+			String strFind;
+			if(str.substring(0, 2).compareTo("<l") == 0) //if json data
+				strFind = "<a href=\"/gag/" + Integer.toString(id) + "\"  target=\"_blank\" ><img src=\"";
 			else
-				l_trending.add(new GagEntry(id, name, url, EntryType.TRENDING));
+				strFind = "<a href=\"/gag/" + Integer.toString(id) + "\"  target=\"_blank\" >\n\t\t<img src=\"";
+			int f1 = str.indexOf(strFind);
+			f1 += strFind.length();
+			int f2 = str.indexOf("\"", f1);			
+			String link = str.substring(f1, f2); 
+			
+			//
+			if(type == EntryType.HOT)
+				l_hot.add(new GagEntry(id, name, url, link, EntryType.HOT));
+			else
+				l_discover.add(new GagEntry(id, name, url, link, EntryType.DISCOVER));
 		}
 	}
 	private void getFirstEntries(EntryType type) throws ClientProtocolException, IOException{
 		HttpGet httpget;		
 		switch (type){				
-			case TRENDING:
-				httpget = new HttpGet(_sMainPage + "trending/");
+			case DISCOVER:
+				httpget = new HttpGet(_sMainPage + "discover/");
 				break;
 			default:
 				httpget = new HttpGet(_sMainPage + "hot/");
@@ -135,7 +145,7 @@ public class NineGAG {
 			while(( i = in.read()) != -1){
 				str.append((char)i);
 			}
-			String str_m = str.toString();
+			String str_m = str.toString();			
 			produceEntriesFromString(str_m, type);
 		}
 	}
@@ -144,7 +154,11 @@ public class NineGAG {
 		httpclient = new DefaultHttpClient();
 		try{
 			getFirstEntries(EntryType.HOT);
-			getFirstEntries(EntryType.TRENDING);
+			//getFirstEntries(EntryType.DISCOVER);
+			updateNewEntries(EntryType.HOT);			
+			//updateNewEntries(EntryType.DISCOVER);
+			updateNewEntries(EntryType.HOT);
+			System.out.println("asdfasdf");
 		}catch(Exception e){
 			System.out.println("FUCK");
 		}
