@@ -18,16 +18,14 @@ import android.widget.ViewFlipper;
 
 
 public class Android_fortestActivity extends Activity{
-	ViewAnimator va;
-	GestureDetector gd;
-	private EntryImgView entryImg;
+	
+	private RibbonView rbV;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        entryImg = new EntryImgView(this, BitmapFactory.decodeResource(this.getResources(), R.drawable.img_test));
-        setContentView(entryImg);
-        entryImg.requestFocus();	        
+        rbV = new RibbonView(this);        
+        setContentView(rbV);
+        //setContentView(new EntryImgView(this, BitmapFactory.decodeResource(this.getResources(), R.drawable.img_test1), null));
     }    
 }

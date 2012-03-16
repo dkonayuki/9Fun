@@ -28,16 +28,28 @@ public class TransformRect{
 			this.top = newTop;
 	}
 	
+	public boolean canGoNext(){
+		return (width + left - oWidth <= 0);
+	}
+	
+	public boolean canGoPrevious(){
+		return (left >= 0);
+	}
 	public float getScaled(){
 		return (float)(width)/oWidth;
 	}
 	
+	public boolean isOriginal(){
+		return (left == oLeft) && (top == oTop)
+				&& (width == oWidth) && (height == oHeight);
+	}
 	public void Reset(){
 		left = oLeft;top = oTop;
 		width = oWidth;height = oHeight;
 	}
 	
 	public void Scale(int focalPX, int focalPY, float factor){
+		/*
 		float percentWidth = ((float)(focalPX - left)/width), percentHeight = ((float)(focalPY - top)/height);		
 		width = (int)Math.max(oWidth*m_MinScale, Math.min(oWidth*m_MaxScale, width*factor));
 		height = (int)Math.max(oHeight*m_MinScale, Math.min(oHeight*m_MaxScale, height*factor));
@@ -48,7 +60,37 @@ public class TransformRect{
 		}else{
 			left = (int) (focalPX - width*percentWidth);
 			top = (int) (focalPY - height*percentHeight);
-
+		}
+		*/
+		float percentWidth = ((float)(focalPX - left)/width), percentHeight = ((float)(focalPY - top)/height);
+		//Find appropriate scale
+		width = (int)(width*factor);
+		height = (int)(height*factor);
+		if(oWidth*m_MinScale >= width*factor){
+			width = (int)(oWidth*m_MinScale);
+			height = (int)(oHeight*m_MinScale);
+		}
+		if(oWidth*m_MaxScale <= width*factor){
+			width = (int)(oWidth*m_MaxScale);
+			height = (int)(oHeight*m_MaxScale);
+		}
+		//
+		if(height <= screenHeight){			
+			//left = (oWidth - width)/2;
+			//Fit on the left and right;
+			if(width + left <= oWidth)
+				left = oWidth - width;
+			else if(left >= 0)
+				left = 0;
+			else
+				left = (int) (focalPX - width*percentWidth);
+			//Fit on top and bottom
+			
+			top = (screenHeight - height)/2; 
+		}else{		
+			
+			left = (int) (focalPX - width*percentWidth);
+			top = (int) (focalPY - height*percentHeight);
 		}
 	}
 	

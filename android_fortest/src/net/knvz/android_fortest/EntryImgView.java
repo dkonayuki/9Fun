@@ -13,14 +13,16 @@ public class EntryImgView extends View {
 	private ScaleGestureDetector _scaleDetector;
 	private GestureDetector _gestureDetector;
 	private TransformRect r_img;
+	private RibbonView m_rbV;
 	
 	public EntryImgView(Context context) {
 		super(context);
 	}
 	
-	public EntryImgView(Context context, Bitmap bmp){
+	public EntryImgView(Context context, Bitmap bmp, RibbonView rbV){
 		this(context);
 		m_bitmap = bmp;
+		m_rbV = rbV;
 		_scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 		_gestureDetector = new GestureDetector(context, new GestureListener());
 		_gestureDetector.setOnDoubleTapListener(new DoubleTapListener());
@@ -54,8 +56,7 @@ public class EntryImgView extends View {
 	public boolean onTouchEvent(MotionEvent ev) {
 		_scaleDetector.onTouchEvent(ev);
 		_gestureDetector.onTouchEvent(ev);
-		return true;
-		
+		return true;		
 	}
 	
 	
@@ -66,6 +67,7 @@ public class EntryImgView extends View {
 			float _scale = detector.getScaleFactor();
 			r_img.Scale((int)detector.getFocusX(), (int)detector.getFocusY()
 					, _scale);
+			//r_img.FixScale();
 			invalidate();
 			return true;
 		}
@@ -73,8 +75,8 @@ public class EntryImgView extends View {
 		@Override
 		public void onScaleEnd(ScaleGestureDetector detector) {			
 			super.onScaleEnd(detector);
-			r_img.FixScale();
-			invalidate();			
+			//r_img.FixScale();
+			//invalidate();			
 		}
 		
 	}
@@ -92,7 +94,7 @@ public class EntryImgView extends View {
 			return true;
 		}
 
-		public boolean onDoubleTapEvent(MotionEvent e) {			
+		public boolean onDoubleTapEvent(MotionEvent e) {
 			return false;
 		}
 
@@ -109,9 +111,13 @@ public class EntryImgView extends View {
 		}
 
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-				float velocityY) {
-			
-			return false;
+				float velocityY) {			
+			if(velocityX < 0 && r_img.canGoNext()){
+				m_rbV.goNext();				
+			}else if (velocityX >= 0 && r_img.canGoPrevious()){
+				m_rbV.goPrevious();				
+			}			
+			return true;
 		}
 
 		public void onLongPress(MotionEvent e) {			
