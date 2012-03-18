@@ -3,7 +3,8 @@ package net.jstudio.gagfun;
 import android.graphics.Rect;
 
 public class TransformRect{
-	private float m_MaxScale = 10.f, m_MinScale = 1.f;
+	private static int error_range = 5;
+	private float m_MaxScale = 10.f, m_MinScale = 1.f;	
 	private int left, top,
 				width, height;
 	private int oLeft, oTop,
@@ -28,11 +29,11 @@ public class TransformRect{
 	}
 	
 	public boolean canGoNext(){
-		return (width + left - oWidth <= 0);
+		return (width + left - oWidth <= error_range);
 	}
 	
 	public boolean canGoPrevious(){
-		return (left >= 0);
+		return (left >= -error_range);
 	}
 	public float getScaled(){
 		return (float)(width)/oWidth;

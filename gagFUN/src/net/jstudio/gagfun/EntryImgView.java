@@ -3,45 +3,34 @@ package net.jstudio.gagfun;
 import java.io.IOException;
 
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
+import net.jstudio.gagCore.GagEntry;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Movie;
 
 public class EntryImgView extends View {
 	private static final String sLoadingFileName = "loading.gif";
-	private Bitmap m_bitmap;
+	private static final double MaxAngleForFling = 0.707106781;//sin(pi/4) 
 	private ScaleGestureDetector _scaleDetector;
 	private GestureDetector _gestureDetector;
 	private TransformRect r_img;
 	private RibbonView m_rbV;
-	private Movie mv_Loading;	
-	private boolean isLoading;
-	private long lStartImageLoading = 0;
-	private DownloadImageTask dlTask;
+	private Movie mv_Loading;
+	private long lStartImageLoading = 0;	
+	private GagEntry _gagEntry;
 	
 	public EntryImgView(Context context) {
 		super(context);
 	}
 	
-	public EntryImgView(Context context, String url, RibbonView rbV){
+	public EntryImgView(Context context, GagEntry gagEntry, RibbonView rbV){
 		this(context);
 		//m_bitmap = bmp;
 		//Load Loading image
@@ -50,42 +39,28 @@ public class EntryImgView extends View {
 		} catch (IOException e) {
 		}
 		m_rbV = rbV;
-		isLoading = true;
-		//Start Download Image
-		dlTask = new DownloadImageTask();
-		dlTask.execute(url);
+		
+		//GagEntry
+		this._gagEntry = gagEntry;	
+		_gagEntry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {
+			
+			public void OnDownloadFinished() {
+                FixImageSize(getWidth(), getHeight());                     
+                invalidate();				
+			}
+		});
 		//
 		_scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 		_gestureDetector = new GestureDetector(context, new GestureListener());
 		_gestureDetector.setOnDoubleTapListener(new DoubleTapListener());		
 	}
 
-	
-	  
-	private Bitmap downloadBitmap(String url) throws IOException {
-		HttpUriRequest request = new HttpGet(url.toString());
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpResponse response = httpClient.execute(request);
-
-		StatusLine statusLine = response.getStatusLine();
-		int statusCode = statusLine.getStatusCode();
-		if (statusCode == 200) {
-			HttpEntity entity = response.getEntity();
-			byte[] bytes = EntityUtils.toByteArray(entity);
-
-			Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0,
-					bytes.length);
-			return bitmap;
-		} else {
-			throw new IOException("Download failed, HTTP response code "
-					+ statusCode + " - " + statusLine.getReasonPhrase());
-		}
-	}
+	public GagEntry getGagEntry(){return _gagEntry;}
 		
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if(isLoading){
+		if(!_gagEntry.isDownloaded()){
 			canvas.drawColor(Color.TRANSPARENT);
 			long now = SystemClock.uptimeMillis();
 			if(lStartImageLoading == 0)
@@ -95,15 +70,15 @@ public class EntryImgView extends View {
 			mv_Loading.draw(canvas, (this.getWidth() - mv_Loading.width())/2, (this.getHeight() - mv_Loading.height())/2);
 			invalidate();	
 		}else if(r_img != null)
-			canvas.drawBitmap(m_bitmap, null, r_img.getRect(), null);
+			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
 	}
 	
 	private void FixImageSize(int w, int h){
-		float scaleW = (float)m_bitmap.getWidth()/w; //No handle for scaleW < 1;
+		float scaleW = (float)_gagEntry.getBitmap().getWidth()/w; //No handle for scaleW < 1;
 		
 		int left, top, width, height;		
 		width = w;
-		height = (int)(m_bitmap.getHeight()/scaleW);
+		height = (int)(_gagEntry.getBitmap().getHeight()/scaleW);
 		//Locate in center		
 		//Translate to 0(height) if left < 0
 		left = 0;
@@ -116,7 +91,7 @@ public class EntryImgView extends View {
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		if(!isLoading){
+		if(_gagEntry.isDownloaded()){
 			FixImageSize(w, h);
 		}
 		super.onSizeChanged(w, h, oldw, oldh);
@@ -127,38 +102,15 @@ public class EntryImgView extends View {
 		_scaleDetector.onTouchEvent(ev);
 		_gestureDetector.onTouchEvent(ev);
 		return true;		
-	}
-	
-	private class DownloadImageTask extends AsyncTask<String, Void, Void>{
+	}	
 
-		@Override
-		protected Void doInBackground(String... params) {
-			//Delete later
-			try {
-				m_bitmap = downloadBitmap(params[0]);
-			} catch (IOException e) {				
-			}
-			//
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {			
-			isLoading = false;
-			int w = getWidth(), h = getHeight();
-			FixImageSize(w, h);			
-			invalidate();
-		}
-		
-		
-	}
 	
 	
 	private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener{
 
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
-			if(!isLoading){
+			if(_gagEntry.isDownloaded()){
 				float _scale = detector.getScaleFactor();
 				r_img.Scale((int)detector.getFocusX(), (int)detector.getFocusY()
 						, _scale);
@@ -178,7 +130,7 @@ public class EntryImgView extends View {
 	private class DoubleTapListener implements GestureDetector.OnDoubleTapListener{
 
 		public boolean onDoubleTap(MotionEvent e) {
-			if(!isLoading){
+			if(_gagEntry.isDownloaded()){
 				if(r_img.getScaled() != 1.f)
 					r_img.Reset();				
 				else
@@ -206,12 +158,16 @@ public class EntryImgView extends View {
 
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
-			if(!isLoading){
-				if(velocityX < 0 && r_img.canGoNext()){
-					m_rbV.goNext();				
-				}else if (velocityX >= 0 && r_img.canGoPrevious()){
-					m_rbV.goPrevious();				
-				}			
+			if(_gagEntry.isDownloaded()){
+				//Check if whether the fling's angle is bellow MaxAngleForFling
+				boolean bAngle = (Math.abs(velocityY)/Math.sqrt(velocityX*velocityX + velocityY*velocityY) <= MaxAngleForFling);
+				if(bAngle){
+					if(velocityX < 0 && r_img.canGoNext()){
+						m_rbV.goNext();				
+					}else if (velocityX >= 0 && r_img.canGoPrevious()){
+						m_rbV.goPrevious();				
+					}			
+				}
 			}else{
 				if(velocityX < 0)
 					m_rbV.goNext();
@@ -226,7 +182,7 @@ public class EntryImgView extends View {
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
-			if(!isLoading){
+			if(_gagEntry.isDownloaded()){
 				r_img.Translate(-(int)distanceX, -(int)distanceY);
 				invalidate();
 			}
