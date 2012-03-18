@@ -68,6 +68,7 @@ public class RibbonView extends ViewAnimator {
 		anim_OutToLeft = AnimationUtils.loadAnimation(ct, R.anim.outtoleft);
 		anim_OutToRight = AnimationUtils.loadAnimation(ct, R.anim.outtoright);
 	}
+	
 	public void goNext(){		
 		_nineGag.Next(EntryType.HOT);
 		if(getChildCount() - getDisplayedChild()<= MaxLoadAhead)
