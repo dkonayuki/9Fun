@@ -1,6 +1,5 @@
 package net.jstudio.gagCore;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +65,8 @@ public class GagEntry {
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap>{
 
 		@Override
-		protected Bitmap doInBackground(String... params) {			
+		protected Bitmap doInBackground(String... params) {
+			Bitmap bitmap = null;
 			try {
 				HttpUriRequest request = new HttpGet(params[0]);				
 				HttpResponse response = _httpClient.execute(request);
@@ -77,15 +77,12 @@ public class GagEntry {
 					HttpEntity entity = response.getEntity();
 					byte[] bytes = EntityUtils.toByteArray(entity);
 
-					Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0,
-							bytes.length);
-					return bitmap;
-				} 
-				return null;
-			} catch (IOException e) {
+					bitmap = BitmapFactory.decodeByteArray(bytes, 0,	bytes.length);					
+				}
+			} catch (Exception e) {
 				Log.d("debug", "Download Image Error");
 			}
-			return null;
+			return bitmap;
 		}
 
 		@Override
