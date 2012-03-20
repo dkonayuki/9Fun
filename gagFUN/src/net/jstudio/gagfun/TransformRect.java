@@ -10,6 +10,7 @@ public class TransformRect{
 	private int oLeft, oTop,
 			oWidth, oHeight;//o = original	
 	private int screenHeight;
+	private final int tBar = 20;
 	
 	public TransformRect(int left, int top, int width, int height, int screenHeight){
 		this.left = oLeft = left;
@@ -109,6 +110,6 @@ public class TransformRect{
 		m_MinScale = min;
 	}
 	public Rect getRect(){
-		return new Rect(left, top, left + width - 1, top + height - 1);
+		return new Rect(left, top-tBar, left + width - 1, top + height - 1);
 	}
 }

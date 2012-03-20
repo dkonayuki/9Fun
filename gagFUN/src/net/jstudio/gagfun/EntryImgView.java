@@ -1,19 +1,32 @@
 package net.jstudio.gagfun;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 
 import net.jstudio.gagCore.GagEntry;
-
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Movie;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.ShapeDrawable;
 
 public class EntryImgView extends View {
 	private static final String sLoadingFileName = "loading.gif";
@@ -25,9 +38,20 @@ public class EntryImgView extends View {
 	private Movie mv_Loading;
 	private long lStartImageLoading = 0;	
 	private GagEntry _gagEntry;
+	private Bitmap tBar;
+	Rect dst = new Rect();
 	
 	public EntryImgView(Context context) {
 		super(context);
+		try{
+		AssetManager assetManager = context.getAssets();
+		InputStream inputStream = assetManager.open("title_bar_portrait.9.png");
+		tBar = BitmapFactory.decodeStream(inputStream);
+		inputStream.close();
+		}catch(IOException e){
+		}finally{
+			
+		}
 	}
 	
 	public EntryImgView(Context context, GagEntry gagEntry, RibbonView rbV){
@@ -58,6 +82,7 @@ public class EntryImgView extends View {
 	public GagEntry getGagEntry(){return _gagEntry;}
 		
 	@Override
+	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		if(!_gagEntry.isDownloaded()){
@@ -67,11 +92,28 @@ public class EntryImgView extends View {
 				lStartImageLoading = now;
 			int relTime = (int)(now - lStartImageLoading) % mv_Loading.duration();
 			mv_Loading.setTime(relTime);			
-			mv_Loading.draw(canvas, (this.getWidth() - mv_Loading.width())/2, (this.getHeight() - mv_Loading.height())/2);
+			mv_Loading.draw(canvas, (this.getWidth() - mv_Loading.width())/2, (this.getHeight() - mv_Loading.height())/2);		
 			invalidate();	
 		}else if(r_img != null)
+			{
+		
+			dst.set(0, 0, canvas.getWidth(), 20);
+			
+		
+			canvas.drawBitmap(tBar, null, dst, null);
 			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			Paint paint=new Paint();
+			paint.setStyle(Paint.Style.FILL);
+			paint.setAntiAlias(true);
+			paint.setColor(Color.WHITE);
+			paint.setTextAlign(Paint.Align.LEFT);
+			paint.setTextSize(18);
+			canvas.drawText(_gagEntry.getEntryName(), 10, 5, paint);
+			
+		
+			}
 	}
+	
 	
 	private void FixImageSize(int w, int h){
 		float scaleW = (float)_gagEntry.getBitmap().getWidth()/w; //No handle for scaleW < 1;

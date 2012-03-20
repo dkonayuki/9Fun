@@ -6,10 +6,14 @@ import java.util.Queue;
 import net.jstudio.gagCore.EntryType;
 import net.jstudio.gagCore.GagEntry;
 import net.jstudio.gagCore.NineGAG;
+import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 import android.widget.ViewAnimator;
 
 public class RibbonView extends ViewAnimator {	
@@ -38,9 +42,23 @@ public class RibbonView extends ViewAnimator {
 		}
 		EntryImgView img = new EntryImgView(this.getContext(), entry, this);
 		addView(img);
+		
+		//setTitle(entry.getEntryName());
+		
+		
 		iCurrentLoadAhead++;
 	}
 	
+/*
+	void setTitle(CharSequence text){
+		Activity parent = (Activity)getContext();
+		Window window = parent.getWindow();
+		window.setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.main);
+		final TextView myTitleText = (TextView)findViewById(R.id.title);
+		if (myTitleText!=null) myTitleText.setText(text);
+		
+	}
+	*/
 	public RibbonView(Context ct) {
 		super(ct);		
 		setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
