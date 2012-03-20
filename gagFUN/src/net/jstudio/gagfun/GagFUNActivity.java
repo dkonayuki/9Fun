@@ -17,7 +17,7 @@ public class GagFUNActivity extends Activity {
         super.onCreate(savedInstanceState);
         rbV = new RibbonView(this);    
   
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(rbV);
     }

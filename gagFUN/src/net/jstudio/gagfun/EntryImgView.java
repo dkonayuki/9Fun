@@ -97,18 +97,19 @@ public class EntryImgView extends View {
 		}else if(r_img != null)
 			{
 		
-			dst.set(0, 0, canvas.getWidth(), 20);
+			dst.set(0, 0, canvas.getWidth(), 40);
 			
 		
-			canvas.drawBitmap(tBar, null, dst, null);
+			
 			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			canvas.drawBitmap(tBar, null, dst, null);
 			Paint paint=new Paint();
 			paint.setStyle(Paint.Style.FILL);
 			paint.setAntiAlias(true);
 			paint.setColor(Color.WHITE);
 			paint.setTextAlign(Paint.Align.LEFT);
-			paint.setTextSize(18);
-			canvas.drawText(_gagEntry.getEntryName(), 10, 5, paint);
+			paint.setTextSize(23);
+			canvas.drawText(_gagEntry.getEntryName(), 10, 30, paint);
 			
 		
 			}
