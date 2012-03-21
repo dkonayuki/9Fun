@@ -5,37 +5,27 @@ import java.io.InputStream;
 
 
 import net.jstudio.gagCore.GagEntry;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.TextView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.ShapeDrawable;
 
-public class EntryImgView extends View {
-	private static final String sLoadingFileName = "loading.gif";
+
+public class EntryImgView extends View {	
 	private static final double MaxAngleForFling = 0.707106781;//sin(pi/4) 
 	private ScaleGestureDetector _scaleDetector;
 	private GestureDetector _gestureDetector;
 	private TransformRect r_img;
 	private RibbonView m_rbV;
-	private Movie mv_Loading;
 	private long lStartImageLoading = 0;	
 	private GagEntry _gagEntry;
 	private Bitmap tBar;
@@ -57,11 +47,6 @@ public class EntryImgView extends View {
 	public EntryImgView(Context context, GagEntry gagEntry, RibbonView rbV){
 		this(context);
 		//m_bitmap = bmp;
-		//Load Loading image
-		try {
-			mv_Loading = Movie.decodeStream(context.getAssets().open(sLoadingFileName));
-		} catch (IOException e) {
-		}
 		m_rbV = rbV;
 		
 		//GagEntry
@@ -85,15 +70,15 @@ public class EntryImgView extends View {
 	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if(!_gagEntry.isDownloaded()){
+		if(!_gagEntry.isDownloaded()){			
 			canvas.drawColor(Color.TRANSPARENT);
 			long now = SystemClock.uptimeMillis();
 			if(lStartImageLoading == 0)
 				lStartImageLoading = now;
-			int relTime = (int)(now - lStartImageLoading) % mv_Loading.duration();
-			mv_Loading.setTime(relTime);			
-			mv_Loading.draw(canvas, (this.getWidth() - mv_Loading.width())/2, (this.getHeight() - mv_Loading.height())/2);		
-			invalidate();	
+			int relTime = (int)(now - lStartImageLoading) % PublicResource.LoadingMovie().duration();
+			PublicResource.LoadingMovie().setTime(relTime);			
+			PublicResource.LoadingMovie().draw(canvas, (this.getWidth() - PublicResource.LoadingMovie().width())/2, (this.getHeight() - PublicResource.LoadingMovie().height())/2);		
+			invalidate();				
 		}else if(r_img != null)
 			{
 		
@@ -102,6 +87,7 @@ public class EntryImgView extends View {
 		
 			
 			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			
 			canvas.drawBitmap(tBar, null, dst, null);
 			Paint paint=new Paint();
 			paint.setStyle(Paint.Style.FILL);

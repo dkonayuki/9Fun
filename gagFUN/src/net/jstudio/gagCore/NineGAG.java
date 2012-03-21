@@ -37,7 +37,7 @@ public class NineGAG {
 	//Some constants
 	private final String _sMainPage = "http://9gag.com/";
 	private final String _sImg = "http://9gag.com/new/json?list=";
-	private static final int _iUpdate = 4;
+	private static final int _iUpdate = 5;
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
 							l_discover 	= new ArrayList<GagEntry>();

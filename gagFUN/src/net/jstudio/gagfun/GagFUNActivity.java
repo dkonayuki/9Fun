@@ -15,6 +15,7 @@ public class GagFUNActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PublicResource.LoadResource(this);
         rbV = new RibbonView(this);    
   
         requestWindowFeature(Window.FEATURE_NO_TITLE);
