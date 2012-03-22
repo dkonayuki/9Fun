@@ -10,7 +10,7 @@ public class TransformRect{
 	private int oLeft, oTop,
 			oWidth, oHeight;//o = original	
 	private int screenHeight;
-	//private final int tBar =40;
+	private Rect m_rect;//for avoiding memory leak
 	
 	public TransformRect(int left, int top, int width, int height, int screenHeight){
 		this.left = oLeft = left;
@@ -18,6 +18,7 @@ public class TransformRect{
 		this.width = oWidth = width;
 		this.height = oHeight = height;
 		this.screenHeight = screenHeight;
+		m_rect = new Rect();
 	}
 	
 	public void Translate(int disX, int disY){
@@ -110,6 +111,10 @@ public class TransformRect{
 		m_MinScale = min;
 	}
 	public Rect getRect(){
-		return new Rect(left, top, left + width - 1, top + height - 1);
+		m_rect.left = left;
+		m_rect.top = top;
+		m_rect.right = left + width - 1;
+		m_rect.bottom = top + height - 1;
+		return m_rect;
 	}
 }

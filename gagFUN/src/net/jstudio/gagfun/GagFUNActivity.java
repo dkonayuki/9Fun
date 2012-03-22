@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class GagFUNActivity extends Activity {
@@ -16,12 +15,12 @@ public class GagFUNActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PublicResource.LoadResource(this);
         rbV = new RibbonView(this);    
   
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(rbV);
-        
+        setContentView(rbV);
     }
     private void CreateMenu(Menu menu){
     	MenuItem mnu1 = menu.add(0, 0, 0, "Choose Page");
