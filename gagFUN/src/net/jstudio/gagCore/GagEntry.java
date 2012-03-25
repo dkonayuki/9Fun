@@ -25,7 +25,7 @@ public class GagEntry {
 	private Bitmap m_bmp;
 	private HttpClient _httpClient;
 	private List<DownloadFinishedListener> dlFinishListener;
-	
+	private DownloadImageTask dlTask;
 	public GagEntry(HttpClient client,
 			int id, 
 			String entryName,
@@ -50,9 +50,13 @@ public class GagEntry {
 	public Bitmap getBitmap(){return m_bmp;}
 	public void StartDownloadBitmap(){
 		if(!_isDownloaded){
-			DownloadImageTask dlTask = new DownloadImageTask();
+			dlTask = new DownloadImageTask();
 			dlTask.execute(_linkImg);
 		}
+	}
+	
+	public void DisposeBitmap(){
+		if(_isDownloaded && dlTask != null && dlTask.getStatus() == )
 	}
 	
 	public synchronized void addDownloadFinished(DownloadFinishedListener dl){
@@ -97,6 +101,11 @@ public class GagEntry {
 					}
 				}
 			}
+		}
+
+		@Override
+		protected void onCancelled() {
+			
 		}
 		
 		
