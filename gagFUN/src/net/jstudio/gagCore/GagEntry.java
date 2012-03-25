@@ -1,5 +1,6 @@
 package net.jstudio.gagCore;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +11,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.util.EntityUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -55,9 +55,19 @@ public class GagEntry {
 		}
 	}
 	
-	public void DisposeBitmap(){
-		if(_isDownloaded && dlTask != null && dlTask.getStatus() == )
+	public void DisposeImage(){
+		if(_isDownloaded && m_bmp != null){
+			m_bmp.recycle();
+			m_bmp = null;			
+		}else{
+			if(dlTask != null && dlTask.getStatus() == AsyncTask.Status.RUNNING){
+				dlTask.cancel(true);
+				dlTask = null;
+			}
+		}		
+		_isDownloaded = false;
 	}
+	
 	
 	public synchronized void addDownloadFinished(DownloadFinishedListener dl){
 		dlFinishListener.add(dl);
@@ -79,9 +89,8 @@ public class GagEntry {
 				int statusCode = statusLine.getStatusCode();
 				if (statusCode == 200) {
 					HttpEntity entity = response.getEntity();
-					byte[] bytes = EntityUtils.toByteArray(entity);
-
-					bitmap = BitmapFactory.decodeByteArray(bytes, 0,	bytes.length);					
+					InputStream in = entity.getContent();
+					bitmap = BitmapFactory.decodeStream(in);			
 				}
 			} catch (Exception e) {
 				Log.d("debug", "Download Image Error");

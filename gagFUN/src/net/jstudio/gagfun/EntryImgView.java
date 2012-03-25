@@ -1,10 +1,7 @@
 package net.jstudio.gagfun;
 
-import java.io.IOException;
-
 
 import net.jstudio.gagCore.GagEntry;
-
 import android.content.Context;
 import android.os.SystemClock;
 import android.view.GestureDetector;
@@ -13,31 +10,24 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Movie;
 
-public class EntryImgView extends View {
-	private static final String sLoadingFileName = "loading.gif";
+
+
+public class EntryImgView extends View {	
 	private static final double MaxAngleForFling = 0.707106781;//sin(pi/4) 
 	private ScaleGestureDetector _scaleDetector;
 	private GestureDetector _gestureDetector;
 	private TransformRect r_img;
 	private RibbonView m_rbV;
-	private Movie mv_Loading;
 	private long lStartImageLoading = 0;	
 	private GagEntry _gagEntry;
-	
+
 	public EntryImgView(Context context) {
 		super(context);
 	}
 	
 	public EntryImgView(Context context, GagEntry gagEntry, RibbonView rbV){
 		this(context);
-		//m_bitmap = bmp;
-		//Load Loading image
-		try {
-			mv_Loading = Movie.decodeStream(context.getAssets().open(sLoadingFileName));
-		} catch (IOException e) {
-		}
 		m_rbV = rbV;
 		
 		//GagEntry
@@ -58,33 +48,30 @@ public class EntryImgView extends View {
 	public GagEntry getGagEntry(){return _gagEntry;}
 		
 	@Override
+	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if(!_gagEntry.isDownloaded()){
+		if(!_gagEntry.isDownloaded()){			
 			canvas.drawColor(Color.TRANSPARENT);
 			long now = SystemClock.uptimeMillis();
 			if(lStartImageLoading == 0)
 				lStartImageLoading = now;
-			int relTime = (int)(now - lStartImageLoading) % mv_Loading.duration();
-			mv_Loading.setTime(relTime);			
-			mv_Loading.draw(canvas, (this.getWidth() - mv_Loading.width())/2, (this.getHeight() - mv_Loading.height())/2);
-			invalidate();	
-		}else if(r_img != null)
-			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			int relTime = (int)(now - lStartImageLoading) % PublicResource.LoadingMovie().duration();
+			PublicResource.LoadingMovie().setTime(relTime);			
+			PublicResource.LoadingMovie().draw(canvas, (this.getWidth() - PublicResource.LoadingMovie().width())/2, (this.getHeight() - PublicResource.LoadingMovie().height())/2);		
+			invalidate();				
+		}else if(r_img != null){		
+			//canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			canvas.drawBitmap(_gagEntry.getBitmap(), r_img.getSrcRect(),
+					r_img.getDstRect(), null);
+		}
 	}
 	
+	
 	private void FixImageSize(int w, int h){
-		float scaleW = (float)_gagEntry.getBitmap().getWidth()/w; //No handle for scaleW < 1;
-		
-		int left, top, width, height;		
-		width = w;
-		height = (int)(_gagEntry.getBitmap().getHeight()/scaleW);
-		//Locate in center		
-		//Translate to 0(height) if left < 0
-		left = 0;
-		top = (height > h) ? 0 : (int)((h - height)/2); 
-		
-		r_img = new TransformRect(left, top, width, height, h);
+		r_img = new TransformRect(_gagEntry.getBitmap().getWidth(), 
+								_gagEntry.getBitmap().getHeight(),
+								w, h);
 		r_img.setMaxScale(3.f);
 		r_img.setMinScale(1.f);
 	}
@@ -114,7 +101,6 @@ public class EntryImgView extends View {
 				float _scale = detector.getScaleFactor();
 				r_img.Scale((int)detector.getFocusX(), (int)detector.getFocusY()
 						, _scale);
-				//r_img.FixScale();
 				invalidate();
 			}
 			return true;
@@ -183,7 +169,7 @@ public class EntryImgView extends View {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			if(_gagEntry.isDownloaded()){
-				r_img.Translate(-(int)distanceX, -(int)distanceY);
+				r_img.Translate((int)distanceX, (int)distanceY);
 				invalidate();
 			}
 			return true;
