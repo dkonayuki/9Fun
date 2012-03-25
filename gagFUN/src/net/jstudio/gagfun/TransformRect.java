@@ -3,118 +3,126 @@ package net.jstudio.gagfun;
 import android.graphics.Rect;
 
 public class TransformRect{
-	private static int error_range = 5;
 	private float m_MaxScale = 10.f, m_MinScale = 1.f;	
-	private int left, top,
-				width, height;
-	private int oLeft, oTop,
-			oWidth, oHeight;//o = original	
-	private int screenHeight;
-	private Rect m_rect;//for avoiding memory leak
+	private int ImgWidth, ImgHeight;	
+	private int screenWidth, screenHeight;
+	private Rect r_Src, r_ActiveDst, r_ActiveSrc;
 	
-	public TransformRect(int left, int top, int width, int height, int screenHeight){
-		this.left = oLeft = left;
-		this.top  = oTop = top;
-		this.width = oWidth = width;
-		this.height = oHeight = height;
+	public TransformRect(int ImgWidth, int ImgHeight, int screenWidth, int screenHeight){		
+		this.ImgWidth = ImgWidth;
+		this.ImgHeight = ImgHeight;
+		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
-		m_rect = new Rect();
+		r_Src = new Rect();
+		r_ActiveDst = new Rect();
+		r_ActiveSrc = new Rect();
+		Init_Rect();
 	}
 	
-	public void Translate(int disX, int disY){
-		//this.left += disX;this.top += disY;
-		int newLeft = left + disX, newTop = top + disY;
-		if(newLeft <= 0 && newLeft >= (oWidth - width))
-			this.left = newLeft;
-		if(height > screenHeight && newTop <= 0 && newTop >= (screenHeight - height))
-			this.top = newTop;
+	private void setRect(Rect r, int left, int top, int width, int height){
+		r.left = left;
+		r.top = top;
+		r.right = left + width;
+		r.bottom = top + height;
 	}
-	
-	public boolean canGoNext(){
-		return (width + left - oWidth <= error_range);
-	}
-	
-	public boolean canGoPrevious(){
-		return (left >= -error_range);
-	}
-	public float getScaled(){
-		return (float)(width)/oWidth;
-	}
-	
-	public boolean isOriginal(){
-		return (left == oLeft) && (top == oTop)
-				&& (width == oWidth) && (height == oHeight);
-	}
-	public void Reset(){
-		left = oLeft;top = oTop;
-		width = oWidth;height = oHeight;
-	}
-	
-	public void Scale(int focalPX, int focalPY, float factor){
-		/*
-		float percentWidth = ((float)(focalPX - left)/width), percentHeight = ((float)(focalPY - top)/height);		
-		width = (int)Math.max(oWidth*m_MinScale, Math.min(oWidth*m_MaxScale, width*factor));
-		height = (int)Math.max(oHeight*m_MinScale, Math.min(oHeight*m_MaxScale, height*factor));
-		if(Math.abs(width - oWidth) <= error_range 
-				&& Math.abs(height - oHeight) <= error_range){
-			left = oLeft;
-			top = oTop;
-		}else{
-			left = (int) (focalPX - width*percentWidth);
-			top = (int) (focalPY - height*percentHeight);
-		}
-		*/
-		float percentWidth = ((float)(focalPX - left)/width), percentHeight = ((float)(focalPY - top)/height);
-		//Find appropriate scale
-		width = (int)(width*factor);
-		height = (int)(height*factor);
-		if(oWidth*m_MinScale >= width*factor){
-			width = (int)(oWidth*m_MinScale);
-			height = (int)(oHeight*m_MinScale);
-		}
-		if(oWidth*m_MaxScale <= width*factor){
-			width = (int)(oWidth*m_MaxScale);
-			height = (int)(oHeight*m_MaxScale);
-		}
+	private void Init_Rect(){
 		//
-		if(height <= screenHeight){			
-			//left = (oWidth - width)/2;
-			//Fit on the left and right;
-			if(width + left <= oWidth)
-				left = oWidth - width;
-			else if(left >= 0)
-				left = 0;
-			else
-				left = (int) (focalPX - width*percentWidth);
-			//Fit on top and bottom
-			
-			top = (screenHeight - height)/2; 
-		}else{		
-			
-			left = (int) (focalPX - width*percentWidth);
-			top = (int) (focalPY - height*percentHeight);
-		}
+		float scale = (float)screenWidth/ImgWidth;
+		int newWidth = ImgWidth, newHeight = (int)(screenHeight/scale);
+		setRect(r_Src, 0, 0, newWidth, newHeight);	
 	}
-	
-	public void FixScale(){
-		if(height < screenHeight){
-			left = (oWidth - width)/2;
-			top = (screenHeight - height)/2;
-		}
-	}
-	
 	public void setMaxScale(float max){
 		m_MaxScale = max;
 	}
-	
 	public void setMinScale(float min){
 		m_MinScale = min;
 	}
-	public Rect getRect(){
-		m_rect.left = left;
-		m_rect.top = top;
-		m_rect.right = left + width - 1;
-		m_rect.bottom = top + height - 1;
-		return m_rect;
+	
+	public void Translate(int disX, int disY){
+		float scale = screenWidth/r_Src.width();//Scale between screen and corresponding rectangle
+		r_Src.offset((int)(disX/scale), (int)(disY/scale));
+		//Fix X coordinate
+		if(r_Src.right >= ImgWidth)
+			r_Src.offset(ImgWidth - r_Src.right, 0);
+		if(r_Src.left <= 0)
+			r_Src.offset(-r_Src.left, 0);
+		//Fix Y coordinate
+		if(r_Src.bottom >= ImgHeight)
+			r_Src.offset(0, ImgHeight - r_Src.bottom);
+		if(r_Src.top <= 0)
+			r_Src.offset(0, -r_Src.top);
+		TranslateToHalfofScreen();
+	}
+	
+	private void TranslateToHalfofScreen(){
+		if(r_Src.height() >= ImgHeight)
+			r_Src.offset(0, -(int)((r_Src.height() - ImgHeight)/2));
+	}
+	public boolean canGoNext(){
+		return (r_Src.right >= ImgWidth);
+	}
+	
+	public boolean canGoPrevious(){
+		return (r_Src.left <= 0);
+	}
+	public float getScaled(){
+		return (float)(ImgWidth)/r_Src.width();
+	}
+	
+	public void Reset(){
+		Init_Rect();
+	}
+	
+	public void Scale(int focalPX, int focalPY, float factor){
+		int newWidth = (int)(r_Src.width()/factor);
+		int MaxWidth = (int)(ImgWidth/m_MinScale), MinWidth = (int)(ImgWidth/m_MaxScale);
+		if(newWidth >= MinWidth && newWidth <= MaxWidth){
+			float screenScale = (float)screenWidth/screenHeight;
+			int newHeight = (int)(newWidth/screenScale);
+			float percentWidth = focalPX/(float)screenWidth, percentHeight = focalPY/(float)screenHeight;
+			int newLeft 	= r_Src.left + (int)((r_Src.width() - newWidth)*percentWidth),
+					newTop 	= r_Src.top + (int)((r_Src.height() - newHeight)*percentHeight);
+			//Fix X coordinate
+			if(newLeft + newWidth >= ImgWidth)
+				newLeft = ImgWidth - newWidth;
+			if(newLeft <= 0)
+				newLeft = 0;
+			//Fix Y coordinate
+			if(newTop + newHeight >= ImgHeight)
+				newTop = ImgHeight - newHeight;
+			if(newTop <= 0)
+				newTop = 0;
+			/////////////////////////////////
+			setRect(r_Src, newLeft, newTop, newWidth, newHeight);
+			TranslateToHalfofScreen();
+		}
+	}
+
+	public Rect getSrcRect(){
+		if(r_Src.height() >= ImgHeight){
+			int 	left 	= r_Src.left,
+					top		= 0,
+					width 	= r_Src.width(),
+					height 	= ImgHeight;
+			setRect(r_ActiveSrc, left, top, width, height);
+		}else
+			setRect(r_ActiveSrc, r_Src.left, r_Src.top,
+							r_Src.width(), r_Src.height());
+		return r_ActiveSrc;
+	}
+	
+	public Rect getDstRect(){
+		if(r_Src.height() >= ImgHeight){	
+			int		 width = r_Src.width(),
+					height = ImgHeight;
+			float scale = (float)width/screenWidth;
+			int 	newLeft 	= 0,
+					newTop 		= (int)((screenHeight - height/scale)/2),
+					newWidth 	= (int)(width/scale),
+					newHeight	= (int)(height/scale);
+			setRect(r_ActiveDst, newLeft, newTop, newWidth, newHeight);
+		}else
+			setRect(r_ActiveDst, 0, 0, screenWidth, screenHeight);
+		return r_ActiveDst;
 	}
 }

@@ -61,23 +61,17 @@ public class EntryImgView extends View {
 			PublicResource.LoadingMovie().draw(canvas, (this.getWidth() - PublicResource.LoadingMovie().width())/2, (this.getHeight() - PublicResource.LoadingMovie().height())/2);		
 			invalidate();				
 		}else if(r_img != null){		
-			canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			//canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
+			canvas.drawBitmap(_gagEntry.getBitmap(), r_img.getSrcRect(),
+					r_img.getDstRect(), null);
 		}
 	}
 	
 	
 	private void FixImageSize(int w, int h){
-		float scaleW = (float)_gagEntry.getBitmap().getWidth()/w; //No handle for scaleW < 1;
-		
-		int left, top, width, height;		
-		width = w;
-		height = (int)(_gagEntry.getBitmap().getHeight()/scaleW);
-		//Locate in center		
-		//Translate to 0(height) if left < 0
-		left = 0;
-		top = (height > h) ? 0 : (int)((h - height)/2); 
-		
-		r_img = new TransformRect(left, top, width, height, h);
+		r_img = new TransformRect(_gagEntry.getBitmap().getWidth(), 
+								_gagEntry.getBitmap().getHeight(),
+								w, h);
 		r_img.setMaxScale(3.f);
 		r_img.setMinScale(1.f);
 	}
@@ -107,7 +101,6 @@ public class EntryImgView extends View {
 				float _scale = detector.getScaleFactor();
 				r_img.Scale((int)detector.getFocusX(), (int)detector.getFocusY()
 						, _scale);
-				//r_img.FixScale();
 				invalidate();
 			}
 			return true;
@@ -176,7 +169,7 @@ public class EntryImgView extends View {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			if(_gagEntry.isDownloaded()){
-				r_img.Translate(-(int)distanceX, -(int)distanceY);
+				r_img.Translate((int)distanceX, (int)distanceY);
 				invalidate();
 			}
 			return true;
