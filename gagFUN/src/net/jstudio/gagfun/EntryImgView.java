@@ -8,6 +8,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Toast;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
@@ -20,8 +21,10 @@ public class EntryImgView extends View {
 	private TransformRect r_img;
 	private RibbonView m_rbV;
 	private long lStartImageLoading = 0;	
+	private long lStartImageLoading2 = 0;
 	private GagEntry _gagEntry;
-
+	boolean notification;
+	
 	public EntryImgView(Context context) {
 		super(context);
 	}
@@ -29,6 +32,7 @@ public class EntryImgView extends View {
 	public EntryImgView(Context context, GagEntry gagEntry, RibbonView rbV){
 		this(context);
 		m_rbV = rbV;
+		notification=true;
 		
 		//GagEntry
 		this._gagEntry = gagEntry;	
@@ -59,11 +63,24 @@ public class EntryImgView extends View {
 			int relTime = (int)(now - lStartImageLoading) % PublicResource.LoadingMovie().duration();
 			PublicResource.LoadingMovie().setTime(relTime);			
 			PublicResource.LoadingMovie().draw(canvas, (this.getWidth() - PublicResource.LoadingMovie().width())/2, (this.getHeight() - PublicResource.LoadingMovie().height())/2);		
-			invalidate();				
+			invalidate();	
 		}else if(r_img != null){		
 			//canvas.drawBitmap(_gagEntry.getBitmap(), null, r_img.getRect(), null);
-			canvas.drawBitmap(_gagEntry.getBitmap(), r_img.getSrcRect(),
-					r_img.getDstRect(), null);
+			canvas.drawBitmap(_gagEntry.getBitmap(), r_img.getSrcRect(),r_img.getDstRect(), null);
+			if (_gagEntry.getBitmap().getHeight()>this.getHeight()&&notification){
+				
+			
+					long now2 = SystemClock.uptimeMillis();
+					if(lStartImageLoading2 == 0)
+						lStartImageLoading2 = now2;
+					int relTime = (int)(now2 - lStartImageLoading2) % PublicResource.LoadingDown().duration();
+					PublicResource.LoadingDown().setTime(relTime);	
+					PublicResource.LoadingDown().draw(canvas, (this.getWidth() - PublicResource.LoadingDown().width())/2, (this.getHeight() - PublicResource.LoadingDown().height())/2+360);		
+					invalidate();
+				
+			}
+			
+				
 		}
 	}
 	
@@ -86,6 +103,7 @@ public class EntryImgView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
+		notification=false;
 		_scaleDetector.onTouchEvent(ev);
 		_gestureDetector.onTouchEvent(ev);
 		return true;		
