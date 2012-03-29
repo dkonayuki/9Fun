@@ -49,8 +49,8 @@ public class NineGAG {
 	private ProgressDialog progressDialog;
 	
 	
-	public List<GagEntry> getListHot(){return l_hot;}
-	public List<GagEntry> getListdiscover(){return l_discover;}
+	public List<GagEntry> getList(int type){if (type==0) return l_hot; else return l_discover;}
+	
 	public void setLoadFirstEntriesFinished(LoadFirstEntriesFinishedListener finished){loadFinished = finished;}
 	
 	public HttpClient getHttpClient(){return httpclient;}
@@ -190,7 +190,7 @@ public class NineGAG {
 		return null;
 	}
 	
-	public NineGAG(Context context){
+	public NineGAG(Context context,int type){
 		//Create Thread-Safe HTTPClient
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
@@ -206,7 +206,7 @@ public class NineGAG {
 		
 		progressDialog = ProgressDialog.show(context, "", context.getString(R.string.Loading));		
 		LoadFirstEntriesTask lfeT = new LoadFirstEntriesTask();		
-		lfeT.execute(EntryType.HOT);
+		if (type==0) lfeT.execute(EntryType.HOT); else lfeT.execute(EntryType.DISCOVER);
 		/*
 		try{
 			getFirstEntries(EntryType.HOT);
