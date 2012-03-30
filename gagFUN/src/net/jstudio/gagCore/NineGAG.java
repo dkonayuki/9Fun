@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.jstudio.gagfun.R;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -44,7 +46,6 @@ public class NineGAG {
 							
 	private int point_hot = 0, point_discover = 0;
 	private DefaultHttpClient httpclient;
-	private Context _context;
 	private LoadFirstEntriesFinishedListener loadFinished;
 	private ProgressDialog progressDialog;
 	
@@ -191,7 +192,6 @@ public class NineGAG {
 	}
 	
 	public NineGAG(Context context){
-		_context = context;
 		//Create Thread-Safe HTTPClient
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
@@ -205,7 +205,7 @@ public class NineGAG {
 		
 		httpclient = new DefaultHttpClient(conMng, params);
 
-		progressDialog = ProgressDialog.show(context, "", "Loading...");		
+		progressDialog = ProgressDialog.show(context, "", context.getString(R.string.Loading));		
 		LoadFirstEntriesTask lfeT = new LoadFirstEntriesTask();		
 		lfeT.execute(EntryType.HOT);
 		/*

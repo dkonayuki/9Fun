@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">GagFUN</string>
+    <string name="hello">Hello World, GagFUNActivity!</string>
     <string name="app_name">GagFUN</string>
-
+    <string name="InternetIsNotAvailable">Sorry! This application can not be run without Internet!</string>
+	<string name="Loading">Loading&#8230;</string>
+	<string name="OK">OK</string>
 </resources>

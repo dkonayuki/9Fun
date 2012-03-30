@@ -25,7 +25,7 @@ public class RibbonView extends ViewAnimator {
 	private NineGAG _nineGag;
 	private Queue<GagEntry> queue_Download;
 	private Animation mAnimation;
-	
+	int type=0;
 	private void addNewView(GagEntry entry){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
@@ -46,15 +46,14 @@ public class RibbonView extends ViewAnimator {
 		TextView title=new TextView(this.getContext());
 		String text= entry.getEntryName();
 		title.setText(text);
-
-		if (text.length()>40){
+		/*if (text.length()>40){
 			mAnimation = new TranslateAnimation(0,-200,0.0f,0.0f);
 			mAnimation.setDuration(10000);
 			mAnimation.setStartTime(AnimationUtils.currentAnimationTimeMillis()+2000);
 			mAnimation.setRepeatCount(Animation.INFINITE);
 			mAnimation.setRepeatMode(Animation.REVERSE);
 			title.setAnimation(mAnimation);
-		}
+		}*/
 		LayoutParams params =
 	        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
 		layout_title.addView(title);
@@ -76,14 +75,14 @@ public class RibbonView extends ViewAnimator {
 		}
 	}
 
-	public RibbonView(Context ct) {
+	public RibbonView(Context ct,final int type) {
 		super(ct);		
 		setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 		loadAnimation();
 		//Queue for Download Image
 		queue_Download = new LinkedList<GagEntry>();
 		//
-		
+		this.type=type;
 		//Initiate for 9Gag
 		_nineGag = new NineGAG(ct);
 		_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
