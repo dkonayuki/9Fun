@@ -31,6 +31,7 @@ public class TransformRect{
 		int newWidth = ImgWidth, newHeight = (int)(screenHeight/scale);
 		setRect(r_Src, 0, 0, newWidth, newHeight);	
 	}
+	
 	public void setMaxScale(float max){
 		m_MaxScale = max;
 	}

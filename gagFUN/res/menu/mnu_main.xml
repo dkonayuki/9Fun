@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item 	android:id="@+id/mnu_choosepage"
+        	android:title="@string/mnuChoosePage"
+        	android:icon="@drawable/mnu_choosepage">
+        	<menu>
+	        	<group android:checkableBehavior="single">
+	        	    <item	android:id="@+id/mnu_hot"
+	        	        	android:title="@string/mnuHot"
+	        	        	android:checked="true"/>
+	        	    <item	android:id="@+id/mnu_trending"
+	        	        	android:title="@string/mnuTrending" />
+	        	</group>
+        	</menu>
+     </item>
+     <item 	android:id="@+id/mnu_setting"
+         	android:title="@string/mnuSettings"
+         	android:icon="@drawable/mnu_settings"
+         	/>
+</menu>

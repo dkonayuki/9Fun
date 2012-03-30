@@ -42,30 +42,48 @@ public class NineGAG {
 	private static final int _iUpdate = 5;
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
-							l_discover 	= new ArrayList<GagEntry>();
+							l_discover 	= new ArrayList<GagEntry>(),
+							l_trending 	= new ArrayList<GagEntry>();
 							
-	private int point_hot = 0, point_discover = 0;
+	private int point_hot = 0, point_discover = 0, point_trending = 0;
 	private DefaultHttpClient httpclient;
 	private LoadFirstEntriesFinishedListener loadFinished;
 	private ProgressDialog progressDialog;
+	private Context _context;
 	
 	
 	public List<GagEntry> getListHot(){return l_hot;}
 	public List<GagEntry> getListdiscover(){return l_discover;}
+	public List<GagEntry> getListTrending(){return l_trending;}
+	public List<GagEntry> getList(EntryType type){
+		switch(type){
+			case TRENDING:
+				return l_trending;
+			case DISCOVER:					
+				return l_discover;
+		}
+		//by default
+		return l_hot;
+	}
+	
 	public void setLoadFirstEntriesFinished(LoadFirstEntriesFinishedListener finished){loadFinished = finished;}
 	
 	public HttpClient getHttpClient(){return httpclient;}
 	private void updateNewEntries(EntryType type) throws ClientProtocolException, IOException{
 		HttpGet httpget;
 		switch(type){
+			case TRENDING:
+				httpget = new HttpGet(_sImg + "trending&id=" 
+									+ l_trending.get(l_trending.size() - 1).getID());
+				break;
 			case DISCOVER:
 				httpget = new HttpGet(_sImg + "discover&id=" 
 										+ l_discover.get(l_discover.size() - 1).getID());
-			break;
+				break;
 			default://HOT	
 				httpget = new HttpGet(_sImg + "hot&id="
 										+ l_hot.get(l_hot.size() - 1).getID());
-			break;
+				break;
 		}
 		HttpResponse response = httpclient.execute(httpget);
 		HttpEntity entity = response.getEntity();
@@ -89,6 +107,8 @@ public class NineGAG {
 				
 				if(type == EntryType.DISCOVER)
 					l_discover.addAll(produceEntriesFromString(strb.toString(), type));
+				else if(type == EntryType.TRENDING)
+					l_trending.addAll(produceEntriesFromString(strb.toString(), type));
 				else
 					l_hot.addAll(produceEntriesFromString(strb.toString(), type));				
 				
@@ -111,6 +131,14 @@ public class NineGAG {
 				updateNewEntries(type);
 			} catch (Exception e) {}
 		
+		if((l_trending.size() != 0 && ((l_trending.size() - point_trending) <= _iUpdate)))
+			try {
+				updateNewEntries(type);
+			} catch (Exception e) {}
+		
+		if(type == EntryType.TRENDING)			
+			return l_trending.get(point_trending++);
+		
 		if(type == EntryType.DISCOVER)			
 			return l_discover.get(point_discover++);
 		
@@ -119,6 +147,7 @@ public class NineGAG {
 	}
 	public int getPointHot(){return point_hot;}
 	public int getPointDiscover(){return point_discover;}
+	public int getPointTrending(){return point_trending;}
 	
 	private List<GagEntry> produceEntriesFromString(String str, EntryType type){
 		Pattern par_gagid = Pattern.compile("gagid=\"[0-9]*\"", Pattern.CASE_INSENSITIVE);
@@ -150,18 +179,8 @@ public class NineGAG {
 			f1 += strFind.length();
 			int f2 = str.indexOf("\"", f1);			
 			String link = str.substring(f1, f2); 
-			
-			//
-			/*
-			if(type == EntryType.HOT)
-				l_hot.add(new GagEntry(httpclient, id, name, url, link, EntryType.HOT));
-			else
-				l_discover.add(new GagEntry(httpclient, id, name, url, link, EntryType.DISCOVER));
-			*/
-			if(type == EntryType.HOT)
-				list_entry.add(new GagEntry(httpclient, id, name, url, link, EntryType.HOT));
-			else
-				list_entry.add(new GagEntry(httpclient, id, name, url, link, EntryType.DISCOVER));			
+		
+			list_entry.add(new GagEntry(httpclient, id, name, url, link, type));
 		}
 		return list_entry;
 	}
@@ -170,6 +189,9 @@ public class NineGAG {
 		switch (type){				
 			case DISCOVER:
 				httpget = new HttpGet(_sMainPage + "discover/");
+				break;
+			case TRENDING:
+				httpget = new HttpGet(_sMainPage + "trending/");
 				break;
 			default:
 				httpget = new HttpGet(_sMainPage + "hot/");
@@ -192,6 +214,7 @@ public class NineGAG {
 	}
 	
 	public NineGAG(Context context){
+		_context = context;
 		//Create Thread-Safe HTTPClient
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
@@ -204,19 +227,14 @@ public class NineGAG {
 		ClientConnectionManager conMng = new ThreadSafeClientConnManager(params, schemeRegistry);
 		
 		httpclient = new DefaultHttpClient(conMng, params);
-
-		progressDialog = ProgressDialog.show(context, "", context.getString(R.string.Loading));		
-		LoadFirstEntriesTask lfeT = new LoadFirstEntriesTask();		
-		lfeT.execute(EntryType.HOT);
-		/*
-		try{
-			getFirstEntries(EntryType.HOT);
-		}catch(Exception e){
-			System.out.println("FUCK");
-		}*/
-		
 	}
 
+	public void StartDownloadFirstPage(EntryType type){
+		progressDialog = ProgressDialog.show(_context, "", _context.getString(R.string.Loading));		
+		LoadFirstEntriesTask lfeT_hot = new LoadFirstEntriesTask();		
+		lfeT_hot.execute(type);
+	}
+	
 	private class LoadFirstEntriesTask extends AsyncTask<EntryType, Void, List<GagEntry>>{
 
 		@Override
@@ -233,6 +251,8 @@ public class NineGAG {
 			EntryType type = result.get(0).getEntryType();
 			if(type == EntryType.DISCOVER)
 				l_discover.addAll(result);
+			else if (type == EntryType.TRENDING)
+				l_trending.addAll(result);
 			else
 				l_hot.addAll(result);
 			if(loadFinished != null)

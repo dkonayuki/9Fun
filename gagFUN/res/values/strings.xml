@@ -5,4 +5,8 @@
     <string name="InternetIsNotAvailable">Sorry! This application can not be run without Internet!</string>
 	<string name="Loading">Loading&#8230;</string>
 	<string name="OK">OK</string>
+	<string name="mnuChoosePage">Choose Page</string>
+	<string name="mnuSettings">Settings&#8230;</string>
+	<string name="mnuHot">Hot Page</string>
+	<string name="mnuTrending">Trending Page</string>
 </resources>

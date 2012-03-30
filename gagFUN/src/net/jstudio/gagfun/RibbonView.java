@@ -10,7 +10,6 @@ import android.content.Context;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -24,8 +23,8 @@ public class RibbonView extends ViewAnimator {
 						anim_OutToRight;	
 	private NineGAG _nineGag;
 	private Queue<GagEntry> queue_Download;
-	private Animation mAnimation;
-	int type=0;
+	private EntryType m_type;
+
 	private void addNewView(GagEntry entry){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
@@ -75,24 +74,25 @@ public class RibbonView extends ViewAnimator {
 		}
 	}
 
-	public RibbonView(Context ct,final int type) {
+	public RibbonView(Context ct, EntryType type, NineGAG nineGag) {
 		super(ct);		
+		m_type = type;
 		setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 		loadAnimation();
 		//Queue for Download Image
 		queue_Download = new LinkedList<GagEntry>();
-		//
-		this.type=type;
-		//Initiate for 9Gag
-		_nineGag = new NineGAG(ct);
+		
+		//Set event download finish for 9Gag
+		_nineGag = nineGag;
 		_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
 			
 			public void OnLoadFirstEntriesFinished() {
 				for(int i = 0; i < MaxFirstImage; i++){
-					addNewView(_nineGag.getListHot().get(i));
+					addNewView(_nineGag.getList(m_type).get(i));					
 				}
 			}
 		});		
+		_nineGag.StartDownloadFirstPage(m_type);
 	}	
 
 	private void loadAnimation(){
@@ -108,16 +108,16 @@ public class RibbonView extends ViewAnimator {
 		
 		//Add newView if necessary
 		if(iDisplayedChild + MaxLoadAhead + 1 == iChildCount){			
-			_nineGag.Next(EntryType.HOT);//Next as rule
-			addNewView(_nineGag.getListHot().get(iChildCount));
+			_nineGag.Next(m_type);//Next as rule
+			addNewView(_nineGag.getList(m_type).get(iChildCount));
 		}else{
 			addEntryToDownloadQueue(
-					_nineGag.getListHot().get(iDisplayedChild + MaxLoadAhead + 1));
+					_nineGag.getList(m_type).get(iDisplayedChild + MaxLoadAhead + 1));
 		}		
 		//Dispose previous Image
 		int prevImg = iDisplayedChild - MaxLoadAhead;
 		if(prevImg >= 0)
-			_nineGag.getListHot().get(prevImg).DisposeImage();			
+			_nineGag.getList(m_type).get(prevImg).DisposeImage();			
 		
 		//Animation
 		if(iDisplayedChild != iChildCount - 1){
@@ -132,9 +132,9 @@ public class RibbonView extends ViewAnimator {
 				prevImg 		= iDisplayedChild - MaxLoadAhead - 1,
 				aheadImg 		= iDisplayedChild + MaxLoadAhead; 
 		if( prevImg >= 0)
-			addEntryToDownloadQueue(_nineGag.getListHot().get(prevImg));
+			addEntryToDownloadQueue(_nineGag.getList(m_type).get(prevImg));
 		if(aheadImg >= MaxFirstImage)
-			_nineGag.getListHot().get(aheadImg).DisposeImage();
+			_nineGag.getList(m_type).get(aheadImg).DisposeImage();
 		
 		//Animation
 		if(iDisplayedChild != 0){
