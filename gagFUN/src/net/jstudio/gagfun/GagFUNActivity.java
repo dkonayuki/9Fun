@@ -15,6 +15,7 @@ public class GagFUNActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkIsConnectedToTheInternet();
         PublicResource.LoadResource(this);
         rbV = new RibbonView(this);    
   
@@ -22,6 +23,11 @@ public class GagFUNActivity extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(rbV);
     }
+    
+    private void checkIsConnectedToTheInternet(){
+    	
+    }
+    
     private void CreateMenu(Menu menu){
     	MenuItem mnu1 = menu.add(0, 0, 0, "Choose Page");
     	{

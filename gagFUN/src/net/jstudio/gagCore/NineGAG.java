@@ -43,7 +43,7 @@ public class NineGAG {
 							l_discover 	= new ArrayList<GagEntry>();
 							
 	private int point_hot = 0, point_discover = 0;
-	private HttpClient httpclient;
+	private DefaultHttpClient httpclient;
 	private Context _context;
 	private LoadFirstEntriesFinishedListener loadFinished;
 	private ProgressDialog progressDialog;
@@ -203,8 +203,8 @@ public class NineGAG {
 		schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));		
 		ClientConnectionManager conMng = new ThreadSafeClientConnManager(params, schemeRegistry);
 		
-		httpclient = new DefaultHttpClient(conMng, params);		
-		
+		httpclient = new DefaultHttpClient(conMng, params);
+
 		progressDialog = ProgressDialog.show(context, "", "Loading...");		
 		LoadFirstEntriesTask lfeT = new LoadFirstEntriesTask();		
 		lfeT.execute(EntryType.HOT);
