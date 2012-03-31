@@ -90,7 +90,10 @@ public class GagEntry {
 				if (statusCode == 200) {
 					HttpEntity entity = response.getEntity();
 					InputStream in = entity.getContent();
-					bitmap = BitmapFactory.decodeStream(in);			
+					BitmapFactory.Options ops = new BitmapFactory.Options();
+					ops.inDensity = 1;
+					ops.inTargetDensity = 1;
+					bitmap = BitmapFactory.decodeStream(in, null, ops);			
 				}
 			} catch (Exception e) {
 				Log.d("debug", "Download Image Error");
