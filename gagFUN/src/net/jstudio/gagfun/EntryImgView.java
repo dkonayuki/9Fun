@@ -102,7 +102,6 @@ public class EntryImgView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-		notification=false;
 		_scaleDetector.onTouchEvent(ev);
 		_gestureDetector.onTouchEvent(ev);
 		return true;		
@@ -185,6 +184,7 @@ public class EntryImgView extends View {
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
+			notification=false;
 			if(_gagEntry.isDownloaded()){
 				r_img.Translate((int)distanceX, (int)distanceY);
 				invalidate();
@@ -192,7 +192,8 @@ public class EntryImgView extends View {
 			return true;
 		}
 		public void onShowPress(MotionEvent e) {}
-		public boolean onSingleTapUp(MotionEvent e) {			
+		public boolean onSingleTapUp(MotionEvent e) {	
+			
 			return false;
 		}
 		

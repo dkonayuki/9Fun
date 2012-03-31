@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-
 public class GagFUN extends Activity {
     /** Called when the activity is first created. */
 	private RibbonView rbV_hot = null,
@@ -40,6 +39,7 @@ public class GagFUN extends Activity {
         }        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		
         PublicResource.LoadResource(this);
         _nineGag = new NineGAG(this); 
@@ -73,7 +73,7 @@ public class GagFUN extends Activity {
     	}
     	return false;
     }
-
+    
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -127,6 +127,7 @@ public class GagFUN extends Activity {
 			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
 	}
     
+
     
     
 }
