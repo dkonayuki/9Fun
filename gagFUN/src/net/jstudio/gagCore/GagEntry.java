@@ -34,7 +34,8 @@ public class GagEntry {
 			EntryType type
 			){
 		_httpClient = client;
-		this._id = id;this._entryName = entryName;
+		this._id = id;
+		this._entryName = entryName;		
 		this._entryUrl = entryUrl;this._type = type;
 		this._linkImg = link;
 		_isDownloaded = false;

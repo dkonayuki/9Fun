@@ -18,10 +18,9 @@ import android.view.WindowManager;
 
 public class GagFUN extends Activity {
     /** Called when the activity is first created. */
-	private RibbonView rbV_hot,
-						rbV_trending;
-	private NineGAG _nineGag;
-	private boolean bFirstTrending = true;
+	private RibbonView rbV_hot = null,
+						rbV_trending = null;
+	private NineGAG _nineGag;	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,13 +38,26 @@ public class GagFUN extends Activity {
         	alert.show();
         	return;
         }        
-        PublicResource.LoadResource(this);
-        _nineGag = new NineGAG(this);
-        rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);        
-  
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(rbV_hot);
+		
+        PublicResource.LoadResource(this);
+        _nineGag = new NineGAG(this); 
+        if(!_nineGag.LoadDataFromFile()){//IF fail to load data, reset all variable to 0
+        	PublicResource.setPrefCurrentView(this, EntryType.HOT, 0);
+        	PublicResource.setPrefCurrentView(this, EntryType.TRENDING, 0);
+        }
+        switch(PublicResource.getPrefCurrentPage(this)){
+        	case HOT:        		
+        		rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);        		
+                setContentView(rbV_hot);                
+        		break;
+        	case TRENDING:        		
+        		rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);        		
+        		setContentView(rbV_trending);
+        		break;
+        		
+        }        
     }
     
     private boolean CheckIfInternetIsAvailable(){
@@ -65,7 +77,19 @@ public class GagFUN extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.mnu_main, menu);		
+		inflater.inflate(R.menu.mnu_main, menu);
+		//Check menu
+		MenuItem item;
+		switch(PublicResource.getPrefCurrentPage(this)){
+			case HOT:
+				item = (MenuItem)menu.findItem(R.id.mnu_hot);
+				item.setChecked(true);
+				break;
+			case TRENDING:
+				item = (MenuItem)menu.findItem(R.id.mnu_trending);
+				item.setChecked(true);
+				break;
+		}
 		return true;
 	}
 
@@ -75,20 +99,32 @@ public class GagFUN extends Activity {
 			item.setChecked(true);
 			switch(item.getItemId()){
 				case R.id.mnu_hot:{
+					if(rbV_hot == null)
+						rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);					
+					PublicResource.setPrefCurrentPage(this, EntryType.HOT);
 					setContentView(rbV_hot);
 					return true;
 				}
 				case R.id.mnu_trending:{
-					if(bFirstTrending){
+					if(rbV_trending == null)
 						rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);
-						bFirstTrending = false;
-					}
+					PublicResource.setPrefCurrentPage(this, EntryType.TRENDING);
 					setContentView(rbV_trending);
 					return true;
 				}
 			}			
 		}		
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onDestroy() {		
+		super.onDestroy();
+		_nineGag.SaveDataToStorage();
+		if(rbV_hot != null)
+			PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
+		if(rbV_trending != null)
+			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
 	}
     
     

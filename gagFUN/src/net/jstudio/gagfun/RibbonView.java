@@ -1,6 +1,7 @@
 package net.jstudio.gagfun;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import net.jstudio.gagCore.EntryType;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 import android.widget.ViewAnimator;
 
 public class RibbonView extends ViewAnimator {	
-	private static final int MaxFirstImage = 5;
+	private static final int MaxFirstImage = 3;
 	private static final int MaxLoadAhead = (int)(MaxFirstImage/2);
 	private Animation 	anim_InFromLeft,
 						anim_InFromRight,
@@ -25,7 +26,7 @@ public class RibbonView extends ViewAnimator {
 	private Queue<GagEntry> queue_Download;
 	private EntryType m_type;
 
-	private void addNewView(GagEntry entry){
+	private void addNewView(GagEntry entry, boolean addToQueue){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
 				GagEntry g = queue_Download.poll();
@@ -33,7 +34,8 @@ public class RibbonView extends ViewAnimator {
 					g.StartDownloadBitmap();
 			}
 		});
-		addEntryToDownloadQueue(entry);
+		if(addToQueue)
+			addEntryToDownloadQueue(entry);
 		//
 		EntryImgView img = new EntryImgView(this.getContext(), entry, this);
 		//addView(img);
@@ -44,15 +46,7 @@ public class RibbonView extends ViewAnimator {
 		LinearLayout layout_main=new LinearLayout(this.getContext());
 		TextView title=new TextView(this.getContext());
 		String text= entry.getEntryName();
-		title.setText(text);
-		/*if (text.length()>40){
-			mAnimation = new TranslateAnimation(0,-200,0.0f,0.0f);
-			mAnimation.setDuration(10000);
-			mAnimation.setStartTime(AnimationUtils.currentAnimationTimeMillis()+2000);
-			mAnimation.setRepeatCount(Animation.INFINITE);
-			mAnimation.setRepeatMode(Animation.REVERSE);
-			title.setAnimation(mAnimation);
-		}*/
+		title.setText(text);		
 		LayoutParams params =
 	        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
 		layout_title.addView(title);
@@ -62,8 +56,6 @@ public class RibbonView extends ViewAnimator {
 		layout.addView(layout_title);
 		layout.addView(layout_main);
 		addView(layout,params);
-	
-				
 	}
 	
 	private void addEntryToDownloadQueue(GagEntry entry){		
@@ -84,15 +76,37 @@ public class RibbonView extends ViewAnimator {
 		
 		//Set event download finish for 9Gag
 		_nineGag = nineGag;
-		_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
-			
-			public void OnLoadFirstEntriesFinished() {
-				for(int i = 0; i < MaxFirstImage; i++){
-					addNewView(_nineGag.getList(m_type).get(i));					
+		List<GagEntry> l_entry = nineGag.getList(m_type);
+		if(l_entry.size() == 0){		
+			_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
+				
+				public void OnLoadFirstEntriesFinished() {
+					for(int i = 0; i < MaxFirstImage; i++){
+						addNewView(_nineGag.getList(m_type).get(i), true);					
+					}
 				}
+			});		
+			_nineGag.StartDownloadFirstPage(m_type);
+		}else{		
+			int iCurrentView = PublicResource.getPrefCurrentView(ct, m_type);
+			//Simulate Next
+			for(int i = 1; i <= iCurrentView; i++){//Notice i = 1
+				nineGag.Next(m_type);
 			}
-		});		
-		_nineGag.StartDownloadFirstPage(m_type);
+			//Load View Without adding to queue download
+			for(int i = 0; i <= iCurrentView - MaxLoadAhead - 1; i++){
+				addNewView(l_entry.get(i), false);				
+			}
+			//Load View
+			if(iCurrentView - MaxLoadAhead >= 0){
+				for(int i = iCurrentView - MaxLoadAhead; i <= iCurrentView + MaxLoadAhead; i++)
+					addNewView(l_entry.get(i), true);
+			}else{
+				for(int i = 0; i < MaxFirstImage; i++)
+					addNewView(l_entry.get(i), true);
+			}
+			setDisplayedChild(iCurrentView);
+		}
 	}	
 
 	private void loadAnimation(){
@@ -109,7 +123,7 @@ public class RibbonView extends ViewAnimator {
 		//Add newView if necessary
 		if(iDisplayedChild + MaxLoadAhead + 1 == iChildCount){			
 			_nineGag.Next(m_type);//Next as rule
-			addNewView(_nineGag.getList(m_type).get(iChildCount));
+			addNewView(_nineGag.getList(m_type).get(iChildCount), true);
 		}else{
 			addEntryToDownloadQueue(
 					_nineGag.getList(m_type).get(iDisplayedChild + MaxLoadAhead + 1));
