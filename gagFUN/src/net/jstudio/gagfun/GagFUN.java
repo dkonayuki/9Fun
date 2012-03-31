@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class GagFUN extends Activity {
@@ -46,10 +48,10 @@ public class GagFUN extends Activity {
         	type=extras.getInt("page");
         }
         rbV = new RibbonView(this,type);    
-  
+       
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(rbV);
+	    setContentView(rbV);
     }
     
     private boolean CheckIfInternetIsAvailable(){

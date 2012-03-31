@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -35,18 +36,14 @@ public class RibbonView extends ViewAnimator {
 			}
 		});
 		addEntryToDownloadQueue(entry);
-		//
+		
 		EntryImgView img = new EntryImgView(this.getContext(), entry, this);
-		//addView(img);
-
-		//Added by Hung
-		LinearLayout layout=new LinearLayout(this.getContext());
-		LinearLayout layout_title=new LinearLayout(this.getContext());
-		LinearLayout layout_main=new LinearLayout(this.getContext());
+		
+		FrameLayout layout=new FrameLayout(this.getContext());
 		TextView title=new TextView(this.getContext());
 		String text= entry.getEntryName();
 		title.setText(text);
-		/*if (text.length()>40){
+		/*if (text.length()>10){
 			mAnimation = new TranslateAnimation(0,-200,0.0f,0.0f);
 			mAnimation.setDuration(10000);
 			mAnimation.setStartTime(AnimationUtils.currentAnimationTimeMillis()+2000);
@@ -55,15 +52,11 @@ public class RibbonView extends ViewAnimator {
 			title.setAnimation(mAnimation);
 		}*/
 		LayoutParams params =
-	        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-		layout_title.addView(title);
-		layout_title.setBackgroundResource(android.R.drawable.title_bar);
-		layout_main.addView(img);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		layout.addView(layout_title);
-		layout.addView(layout_main);
+	        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+		layout.addView(img);
+		
 		addView(layout,params);
-	
+		layout.addView(title);
 				
 	}
 	
