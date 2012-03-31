@@ -39,10 +39,9 @@ public class GagFUN extends Activity {
         }        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		
-        PublicResource.LoadResource(this);
-        _nineGag = new NineGAG(this); 
+        
+		PublicResource.LoadResource(this);
+        _nineGag = new NineGAG(this);        
         if(!_nineGag.LoadDataFromFile()){//IF fail to load data, reset all variable to 0
         	PublicResource.setPrefCurrentView(this, EntryType.HOT, 0);
         	PublicResource.setPrefCurrentView(this, EntryType.TRENDING, 0);
