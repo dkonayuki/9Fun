@@ -1,5 +1,8 @@
 package net.jstudio.gagCore;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ public class NineGAG {
 	private final String _sMainPage = "http://9gag.com/";
 	private final String _sImg = "http://9gag.com/new/json?list=";
 	private static final int _iUpdate = 5;
+	private static final String _sSavedFileName = "saved";
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
 							l_discover 	= new ArrayList<GagEntry>(),
@@ -165,7 +169,7 @@ public class NineGAG {
 			
 			String name = match_text.group().replaceFirst("(?i)data-text=\"", "")
 					.replaceFirst("\"", "");				
-			
+			name = Utilities.ConvertHTMLEntities(name);
 			String url = match_dataurl.group().replaceFirst("(?i)data-url=\"", "")
 					.replaceFirst("\"", "");
 			
@@ -234,6 +238,100 @@ public class NineGAG {
 		LoadFirstEntriesTask lfeT_hot = new LoadFirstEntriesTask();		
 		lfeT_hot.execute(type);
 	}
+	
+	private enum DataToFile{
+		ID,
+		NAME,
+		URL,
+		IMGLINK
+	}
+	private String getJSONString(EntryType type){
+		JSONArray array = new JSONArray();
+		List<GagEntry> list = null;
+		switch(type){
+		case HOT:
+			list = l_hot;
+			break;
+		case TRENDING:
+			list = l_trending;
+			break;
+		}
+		for(GagEntry entry : list){
+			JSONObject js_item = new JSONObject();
+			try {
+				js_item.put(DataToFile.ID.toString(), entry.getID());
+				js_item.put(DataToFile.NAME.toString(), entry.getEntryName());
+				js_item.put(DataToFile.URL.toString(), entry.getEntryUrl());
+				js_item.put(DataToFile.IMGLINK.toString(), entry.getLink());
+				array.put(js_item.toString());
+			} catch (JSONException e) {				
+			}				
+		}
+		return array.toString();
+	}
+	public void SaveDataToStorage(){		
+		try {
+			FileOutputStream fos = _context.openFileOutput(_sSavedFileName, Context.MODE_PRIVATE);
+			JSONObject json = new JSONObject();
+			try {
+				json.put(EntryType.HOT.toString(), getJSONString(EntryType.HOT));
+				json.put(EntryType.TRENDING.toString(), getJSONString(EntryType.TRENDING));
+			} catch (JSONException e) {
+			}
+			fos.write(json.toString().getBytes());
+			fos.close();
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+	}
+	
+	
+	public boolean LoadDataFromFile(){
+		try{										
+			FileInputStream fis = _context.openFileInput(_sSavedFileName);			
+			StringBuilder sf = new StringBuilder();
+			int c;
+			while((c = fis.read()) != -1)
+				sf.append((char)c);			
+			fis.close();
+			//Process String
+			String sResult = sf.toString();
+			try {
+				JSONObject json = new JSONObject(sResult);
+				//HOT
+				JSONArray arr = new JSONArray(json.getString(EntryType.HOT.toString()).toString());
+				for(int i = 0; i < arr.length() - 1; i++){
+					JSONObject js_item = new JSONObject(arr.getString(i));
+					l_hot.add(new GagEntry(httpclient,
+							js_item.getInt(DataToFile.ID.toString()),
+							js_item.getString(DataToFile.NAME.toString()),
+							js_item.getString(DataToFile.URL.toString()),
+							js_item.getString(DataToFile.IMGLINK.toString()),
+							EntryType.HOT
+							));
+				}
+				//TRENDING
+				arr = new JSONArray(json.getString(EntryType.TRENDING.toString()).toString());
+				for(int i = 0; i < arr.length() - 1; i++){
+					JSONObject js_item = new JSONObject(arr.getString(i));
+					l_trending.add(new GagEntry(httpclient,
+							js_item.getInt(DataToFile.ID.toString()),
+							js_item.getString(DataToFile.NAME.toString()),
+							js_item.getString(DataToFile.URL.toString()),
+							js_item.getString(DataToFile.IMGLINK.toString()),
+							EntryType.TRENDING
+							));
+				}
+			} catch (JSONException e) {				
+			}
+		}catch(FileNotFoundException e){
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+	
 	
 	private class LoadFirstEntriesTask extends AsyncTask<EntryType, Void, List<GagEntry>>{
 

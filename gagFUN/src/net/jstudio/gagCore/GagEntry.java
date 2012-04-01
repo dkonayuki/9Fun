@@ -26,6 +26,13 @@ public class GagEntry {
 	private HttpClient _httpClient;
 	private List<DownloadFinishedListener> dlFinishListener;
 	private DownloadImageTask dlTask;
+	
+	//Number of likes
+	private GetCallback gcbLikes = null;
+	private GetNumberOfLikesTask likesTask = null;
+	private static final String likeapi_begin = "http://api.facebook.com/method/fql.query?query=select%20total_count%20from%20link_stat%20where%20url=%279";
+	private static final String likeapi_end = "%27&format=json";
+	//
 	public GagEntry(HttpClient client,
 			int id, 
 			String entryName,
@@ -34,7 +41,8 @@ public class GagEntry {
 			EntryType type
 			){
 		_httpClient = client;
-		this._id = id;this._entryName = entryName;
+		this._id = id;
+		this._entryName = entryName;		
 		this._entryUrl = entryUrl;this._type = type;
 		this._linkImg = link;
 		_isDownloaded = false;
@@ -73,6 +81,45 @@ public class GagEntry {
 		dlFinishListener.add(dl);
 	}
 	
+	public void getLikes(GetCallback gcb){
+		gcbLikes = gcb;
+		likesTask = new GetNumberOfLikesTask();
+		String sRequest = likeapi_begin + _entryUrl + likeapi_end;
+		likesTask.execute(sRequest);
+	}
+	public interface GetCallback{
+		public void OnGetCallBackInt(int value);
+	}
+	private class GetNumberOfLikesTask extends AsyncTask<String, Void, Integer>{
+
+		@Override
+		protected Integer doInBackground(String... params) {
+			Integer re = null;
+			try{
+				HttpUriRequest request = new HttpGet(params[0]);				
+				HttpResponse response = _httpClient.execute(request);
+				HttpEntity entity = response.getEntity();
+				if(entity != null){
+					StringBuilder str_b = new StringBuilder();
+					InputStream in = entity.getContent();
+					int i;
+					while(( i = in.read()) != -1)
+						str_b.append((char)i);					
+					String str = str_b.toString();
+					int f1 = str.indexOf(":");
+					int f2 = str.indexOf("}", f1);
+					re = new Integer(str.substring(f1 + 1, f2));
+				}
+			}catch(Exception e){}
+			return re;
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			if(gcbLikes != null)
+				gcbLikes.OnGetCallBackInt(result.intValue());
+		}
+	}
 	public interface DownloadFinishedListener{
 		public void OnDownloadFinished();
 	}
