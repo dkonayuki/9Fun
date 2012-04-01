@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -68,8 +69,9 @@ public class RibbonView extends ViewAnimator {
 	    menuTop.setGravity(Gravity.RIGHT);
 		menuTop.setOrientation(LinearLayout.HORIZONTAL);
 		 //Reload Button
-        ImageView btt_Refresh= new ImageView(this.getContext()); 
-        btt_Refresh.setImageResource(R.drawable.ic_reload);
+        ImageButton btt_Refresh= new ImageButton(this.getContext());
+        btt_Refresh.setBackgroundColor(Color.TRANSPARENT);
+        btt_Refresh.setImageResource(R.drawable.button_refresh);
         LinearLayout temp= new LinearLayout(this.getContext());
         temp.addView(btt_Refresh,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         menuTop.addView(temp,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
@@ -87,8 +89,9 @@ public class RibbonView extends ViewAnimator {
         menuBot.setBackgroundResource(R.drawable.bar_bottom);
         //Like Button
         LinearLayout temp3= new LinearLayout(this.getContext());
-        ImageView btt_Like = new ImageView(this.getContext());
-        btt_Like.setImageResource(R.drawable.ic_like);
+        ImageButton btt_Like = new ImageButton(this.getContext());
+        btt_Like.setImageResource(R.drawable.button_like);
+        btt_Like.setBackgroundColor(Color.TRANSPARENT);
         m_LikeNumber = new TextView(this.getContext());
         m_LikeNumber.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         m_LikeNumber.setText("--");
@@ -97,8 +100,9 @@ public class RibbonView extends ViewAnimator {
         temp3.addView(m_LikeNumber,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
         menuBot.addView(temp3);
         //Comment Button
-        ImageView btt_Comment = new ImageView(this.getContext());
-        btt_Comment.setImageResource(R.drawable.ic_cmt);
+        ImageButton btt_Comment = new ImageButton(this.getContext());
+        btt_Comment.setImageResource(R.drawable.button_comment);
+        btt_Comment.setBackgroundColor(Color.TRANSPARENT);
         LinearLayout temp2= new LinearLayout(this.getContext());
         temp2.addView(btt_Comment,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         temp2.setOrientation(LinearLayout.HORIZONTAL);

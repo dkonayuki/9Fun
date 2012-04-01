@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -96,25 +97,34 @@ public class GagFUN extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(!item.isChecked()){
-			item.setChecked(true);
+		
 			switch(item.getItemId()){
-				case R.id.mnu_hot:{
+				case R.id.mnu_hot:
+					if(!item.isChecked()){
+						item.setChecked(true);
 							if(rbV_hot == null)
 						rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);					
 					PublicResource.setPrefCurrentPage(this, EntryType.HOT);
 					setContentView(rbV_hot);
-					return true;
-				}
-				case R.id.mnu_trending:{
+					
+				}return true;
+				case R.id.mnu_trending:
+					if(!item.isChecked()){
+						item.setChecked(true);
 					if(rbV_trending == null)
 						rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);
 						PublicResource.setPrefCurrentPage(this, EntryType.TRENDING);
 					setContentView(rbV_trending);
+					
+				}return true;
+				case R.id.mnu_setting:{
+					startActivity(new Intent("net.jstudio.Preference"));
+				}return true;
+				case R.id.mnu_login:{
 					return true;
 				}
 			}			
-		}		
+				
 		return super.onOptionsItemSelected(item);
 	}
     

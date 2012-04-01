@@ -15,7 +15,8 @@ public  class Utilities {
 			mEntities.put("&#038;", "&");
 			mEntities.put("&#039;", "'");
 			mEntities.put("&#060;", "<");
-			mEntities.put("&#062;", ">");			
+			mEntities.put("&#062;", ">");	
+			mEntities.put("&quot;","\"");
 		}		
 		@SuppressWarnings("rawtypes")
 		Iterator i = mEntities.entrySet().iterator();

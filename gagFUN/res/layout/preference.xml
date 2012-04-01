@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+        android:title="9GAG Content"
+        android:key="first_category">
+    
+  <CheckBoxPreference android:title="@string/safeModeTitle"
+                      android:defaultValue="false"
+                      android:summary="@string/safeModeSub"
+                      android:key="safeMode" />
+  </PreferenceCategory>
+   <PreferenceCategory
+        android:title="Application"
+        android:key="second_category">
+  
+  <CheckBoxPreference android:title="@string/buttonModeTitle"
+                      android:defaultValue="false"
+                      android:summary="@string/buttonModeSub"
+                      android:key="touchMode" />
+  </PreferenceCategory>
+</PreferenceScreen>
