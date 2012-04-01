@@ -32,6 +32,7 @@ public class GagEntry {
 	private GetNumberOfLikesTask likesTask = null;
 	private static final String likeapi_begin = "http://api.facebook.com/method/fql.query?query=select%20total_count%20from%20link_stat%20where%20url=%279";
 	private static final String likeapi_end = "%27&format=json";
+	private static final String fbcommentapi = "https://www.facebook.com/plugins/comments.php?href=";
 	//
 	public GagEntry(HttpClient client,
 			int id, 
@@ -56,6 +57,9 @@ public class GagEntry {
 	public String getLink(){return _linkImg;}
 	public boolean isDownloaded(){return _isDownloaded;}
 	public Bitmap getBitmap(){return m_bmp;}
+	public String getFBCommentLink(){return fbcommentapi + _entryUrl;}
+	
+	
 	public void StartDownloadBitmap(){
 		if(!_isDownloaded){
 			dlTask = new DownloadImageTask();

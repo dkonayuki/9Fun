@@ -132,10 +132,16 @@ public class GagFUN extends Activity {
 	protected void onDestroy() {		
 		super.onDestroy();
 		_nineGag.SaveDataToStorage();
-		if(rbV_hot != null)
+		if(rbV_hot != null){
 			PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
-		if(rbV_trending != null)
+			rbV_hot.DisposeAllDialog();
+		}
+		if(rbV_trending != null){
 			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
+			rbV_trending.DisposeAllDialog();
+		}
+		
+		
 	}
     
 }

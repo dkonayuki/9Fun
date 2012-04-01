@@ -194,7 +194,7 @@ public class EntryImgView extends View {
 		public void onShowPress(MotionEvent e) {}
 		public boolean onSingleTapUp(MotionEvent e) {	
 			if (m_rbV.isDisplayedMenu()) m_rbV.hideMenu();
-			else m_rbV.displayMenu(_gagEntry);
+			else m_rbV.displayMenu();
 			return true;
 		}
 		

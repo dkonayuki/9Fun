@@ -10,12 +10,12 @@ import net.jstudio.gagCore.NineGAG;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -35,12 +35,14 @@ public class RibbonView extends ViewAnimator {
 	private NineGAG _nineGag;
 	private Queue<GagEntry> queue_Download;
 	private EntryType m_type;
-	boolean menu_on=false;
+	private boolean menu_on = false;
 	
 	private TextView m_Title, m_LikeNumber;
 	private FrameLayout layout;
 	private LinearLayout menuTop, menuBot;
+	private CommentDialog FBCmtDialog = null;
 	
+	private GagEntry getCurrentEntry(){return _nineGag.getList(m_type).get(getDisplayedChild());}
 	private void addNewView(GagEntry entry, boolean addToQueue){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
@@ -103,14 +105,27 @@ public class RibbonView extends ViewAnimator {
         ImageButton btt_Comment = new ImageButton(this.getContext());
         btt_Comment.setImageResource(R.drawable.button_comment);
         btt_Comment.setBackgroundColor(Color.TRANSPARENT);
+        btt_Comment.setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				FBCmtDialog = new CommentDialog(getContext(), 
+						getCurrentEntry().getFBCommentLink());
+		    	int[] pos = {0, 0};
+		    	v.getLocationOnScreen(pos);
+		    	FBCmtDialog.setPosition(pos[0] + v.getWidth()/2, pos[1] + v.getHeight()/2);
+		    	FBCmtDialog.show();
+				
+			}        	
+        });
         LinearLayout temp2= new LinearLayout(this.getContext());
         temp2.addView(btt_Comment,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         temp2.setOrientation(LinearLayout.HORIZONTAL);
         temp2.setGravity(Gravity.RIGHT);
         menuBot.addView(temp2,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-	}	
+	}
 	
-	public void displayMenu(GagEntry entry){
+	
+	public void displayMenu(){
+		GagEntry entry = getCurrentEntry();
 		menu_on=true;		
 		m_Title.setText(entry.getEntryName());
 		entry.getLikes(new GagEntry.GetCallback() {
@@ -240,4 +255,8 @@ public class RibbonView extends ViewAnimator {
 		}
 	}
 
+	public void DisposeAllDialog(){
+		if(FBCmtDialog != null && FBCmtDialog.isShowing())
+			FBCmtDialog.dismiss();
+	}
 }
