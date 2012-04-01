@@ -9,19 +9,13 @@ import net.jstudio.gagCore.GagEntry;
 import net.jstudio.gagCore.NineGAG;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -41,11 +35,12 @@ public class RibbonView extends ViewAnimator {
 	private Queue<GagEntry> queue_Download;
 	private EntryType m_type;
 	boolean menu_on=false;
-	TextView m_Title;
-	FrameLayout layout;
-	LinearLayout menuTop,menuBot;
 	
-		private void addNewView(GagEntry entry, boolean addToQueue){
+	private TextView m_Title, m_LikeNumber;
+	private FrameLayout layout;
+	private LinearLayout menuTop, menuBot;
+	
+	private void addNewView(GagEntry entry, boolean addToQueue){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
 				GagEntry g = queue_Download.poll();
@@ -94,12 +89,12 @@ public class RibbonView extends ViewAnimator {
         LinearLayout temp3= new LinearLayout(this.getContext());
         ImageView btt_Like = new ImageView(this.getContext());
         btt_Like.setImageResource(R.drawable.ic_like);
-        TextView like_number = new TextView(this.getContext());
-        like_number.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-        like_number.setText("2");
-        like_number.setTextSize(20);
+        m_LikeNumber = new TextView(this.getContext());
+        m_LikeNumber.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        m_LikeNumber.setText("--");
+        m_LikeNumber.setTextSize(20);
         temp3.addView(btt_Like);
-        temp3.addView(like_number,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+        temp3.addView(m_LikeNumber,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
         menuBot.addView(temp3);
         //Comment Button
         ImageView btt_Comment = new ImageView(this.getContext());
@@ -109,14 +104,17 @@ public class RibbonView extends ViewAnimator {
         temp2.setOrientation(LinearLayout.HORIZONTAL);
         temp2.setGravity(Gravity.RIGHT);
         menuBot.addView(temp2,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-	}
+	}	
 	
-	
-	
-	public void displayMenu(String title){
-		menu_on=true;
-		title=title.replace("&#039;","'");
-		m_Title.setText(title);
+	public void displayMenu(GagEntry entry){
+		menu_on=true;		
+		m_Title.setText(entry.getEntryName());
+		entry.getLikes(new GagEntry.GetCallback() {
+			
+			public void OnGetCallBackInt(int value) {
+				m_LikeNumber.setText(String.valueOf(value));				
+			}
+		});		
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));
 		((ViewGroup) this.getCurrentView()).addView(menuBot,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
 		menuTop.startAnimation(anim_InFromTop);
