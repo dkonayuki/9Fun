@@ -9,4 +9,6 @@
 	<string name="mnuSettings">Settings&#8230;</string>
 	<string name="mnuHot">Hot Page</string>
 	<string name="mnuTrending">Trending Page</string>
+	<string name="mnuLogin">Login</string>
+	<string name="stSafemode">Safemode</string>
 </resources>

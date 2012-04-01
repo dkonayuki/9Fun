@@ -7,12 +7,20 @@ import net.jstudio.gagCore.EntryType;
 import net.jstudio.gagCore.GagEntry;
 import net.jstudio.gagCore.NineGAG;
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -21,11 +29,21 @@ public class RibbonView extends ViewAnimator {
 	private static final int MaxLoadAhead = (int)(MaxFirstImage/2);
 	private Animation 	anim_InFromLeft,
 						anim_InFromRight,
+						anim_InFromTop,
+						anim_InFromBot,
 						anim_OutToLeft,
-						anim_OutToRight;	
+						anim_OutToRight,
+						anim_OutToTop,
+						anim_OutToBot;
+	
 	private NineGAG _nineGag;
 	private Queue<GagEntry> queue_Download;
 	private EntryType m_type;
+	boolean menu_on=false;
+	TextView m_Title;
+	FrameLayout layout;
+	LinearLayout menuTop,menuBot;
+	
 	private void addNewView(GagEntry entry){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
@@ -37,26 +55,77 @@ public class RibbonView extends ViewAnimator {
 		addEntryToDownloadQueue(entry);
 		
 		EntryImgView img = new EntryImgView(this.getContext(), entry, this);
-		
-		FrameLayout layout=new FrameLayout(this.getContext());
-		TextView title=new TextView(this.getContext());
-		String text= entry.getEntryName();
-		title.setText(text);
-		/*if (text.length()>10){
-			mAnimation = new TranslateAnimation(0,-200,0.0f,0.0f);
-			mAnimation.setDuration(10000);
-			mAnimation.setStartTime(AnimationUtils.currentAnimationTimeMillis()+2000);
-			mAnimation.setRepeatCount(Animation.INFINITE);
-			mAnimation.setRepeatMode(Animation.REVERSE);
-			title.setAnimation(mAnimation);
-		}*/
 		LayoutParams params =
-	        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        		new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+		layout=new FrameLayout(this.getContext());
 		layout.addView(img);
-		
 		addView(layout,params);
-		layout.addView(title);
-				
+	}
+	public boolean isDisplayedMenu(){
+		return menu_on;
+	}
+	public void createMenu(){
+		//Menu Top
+		menuTop = new LinearLayout(this.getContext());
+		menuTop.setBackgroundResource(R.drawable.title_bar);
+	    menuTop.setGravity(Gravity.RIGHT);
+		menuTop.setOrientation(LinearLayout.HORIZONTAL);
+		 //Reload Button
+        ImageView btt_Refresh= new ImageView(this.getContext()); 
+        btt_Refresh.setImageResource(R.drawable.ic_reload);
+        LinearLayout temp= new LinearLayout(this.getContext());
+        temp.addView(btt_Refresh,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+        menuTop.addView(temp,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+       
+        //Title
+		m_Title = new TextView(this.getContext());
+        m_Title.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        m_Title.setTextColor(Color.WHITE);
+        m_Title.setTextSize(20);
+        menuTop.addView(m_Title,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT)); 
+        
+        //Menu Bottom
+        menuBot = new LinearLayout(this.getContext());
+        menuBot.setOrientation(LinearLayout.HORIZONTAL);
+        menuBot.setBackgroundResource(R.drawable.bar_bottom);
+        //Like Button
+        LinearLayout temp3= new LinearLayout(this.getContext());
+        ImageView btt_Like = new ImageView(this.getContext());
+        btt_Like.setImageResource(R.drawable.ic_like);
+        TextView like_number = new TextView(this.getContext());
+        like_number.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        like_number.setText("2");
+        like_number.setTextSize(20);
+        temp3.addView(btt_Like);
+        temp3.addView(like_number,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+        menuBot.addView(temp3);
+        //Comment Button
+        ImageView btt_Comment = new ImageView(this.getContext());
+        btt_Comment.setImageResource(R.drawable.ic_cmt);
+        LinearLayout temp2= new LinearLayout(this.getContext());
+        temp2.addView(btt_Comment,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+        temp2.setOrientation(LinearLayout.HORIZONTAL);
+        temp2.setGravity(Gravity.RIGHT);
+        menuBot.addView(temp2,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+	}
+	
+	
+	
+	public void displayMenu(String title){
+		menu_on=true;
+		title=title.replace("&#039;","'");
+		m_Title.setText(title);
+		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));
+		((ViewGroup) this.getCurrentView()).addView(menuBot,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
+		menuTop.startAnimation(anim_InFromTop);
+		menuBot.startAnimation(anim_InFromBot);
+	}
+	public void hideMenu(){
+		menu_on=false;
+		menuTop.startAnimation(anim_OutToTop);
+		menuBot.startAnimation(anim_OutToBot);
+		((ViewGroup) this.getCurrentView()).removeView(menuTop);
+		((ViewGroup) this.getCurrentView()).removeView(menuBot);
 	}
 	
 	private void addEntryToDownloadQueue(GagEntry entry){		
@@ -69,6 +138,7 @@ public class RibbonView extends ViewAnimator {
 
 	public RibbonView(Context ct, EntryType type, NineGAG nineGag) {
 		super(ct);	
+		createMenu();
 		m_type = type;	
 		setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 		loadAnimation();
@@ -92,8 +162,12 @@ public class RibbonView extends ViewAnimator {
 		Context ct = this.getContext();
 		anim_InFromLeft = AnimationUtils.loadAnimation(ct, R.anim.infromleft);
 		anim_InFromRight = AnimationUtils.loadAnimation(ct, R.anim.infromright);
+		anim_InFromTop= AnimationUtils.loadAnimation(ct, R.anim.infromtop);
+		anim_InFromBot= AnimationUtils.loadAnimation(ct, R.anim.infrombot);
 		anim_OutToLeft = AnimationUtils.loadAnimation(ct, R.anim.outtoleft);
 		anim_OutToRight = AnimationUtils.loadAnimation(ct, R.anim.outtoright);
+		anim_OutToBot = AnimationUtils.loadAnimation(ct, R.anim.outtobot);
+		anim_OutToTop= AnimationUtils.loadAnimation(ct, R.anim.outtotop);
 	}
 	
 	public void goNext(){		
@@ -114,9 +188,11 @@ public class RibbonView extends ViewAnimator {
 		
 		//Animation
 		if(iDisplayedChild != iChildCount - 1){
+			if (isDisplayedMenu()) hideMenu();
 			setInAnimation(anim_InFromRight);
 			setOutAnimation(anim_OutToLeft);
 			showNext();
+			
 		}		
 	}
 	
@@ -133,6 +209,7 @@ public class RibbonView extends ViewAnimator {
 		if(iDisplayedChild != 0){
 			setInAnimation(anim_InFromLeft);
 			setOutAnimation(anim_OutToRight);
+			if (isDisplayedMenu()) hideMenu();
 			showPrevious();
 		}
 	}

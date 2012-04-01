@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/frameLayout1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+        
+
+    <FrameLayout
+        android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-        
-        <TextView
-        android:id="@+id/title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:editable="true"
-        android:text="9Gag" />
-</FrameLayout>
+		
+
+
+        <RelativeLayout
+            android:id="@+id/top_menu"
+            android:layout_width="match_parent"
+            android:layout_height="121dp" >
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

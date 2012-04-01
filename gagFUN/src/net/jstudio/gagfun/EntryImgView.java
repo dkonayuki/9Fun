@@ -193,8 +193,9 @@ public class EntryImgView extends View {
 		}
 		public void onShowPress(MotionEvent e) {}
 		public boolean onSingleTapUp(MotionEvent e) {	
-			
-			return false;
+			if (m_rbV.isDisplayedMenu()) m_rbV.hideMenu();
+			else m_rbV.displayMenu(_gagEntry.getEntryName());
+			return true;
 		}
 		
 	}

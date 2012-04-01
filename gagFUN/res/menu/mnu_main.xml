@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item 	android:id="@+id/mnu_choosepage"
         	android:title="@string/mnuChoosePage"
-        	android:icon="@drawable/mnu_choosepage">
+        	android:icon="@drawable/ic_page">
         	<menu>
 	        	<group android:checkableBehavior="single">
 	        	    <item	android:id="@+id/mnu_hot"
@@ -13,8 +13,12 @@
 	        	</group>
         	</menu>
      </item>
+     <item 	android:id="@+id/mnu_login"
+         	android:title="@string/mnuLogin"
+         	android:icon="@drawable/ic_login"
+         	/>
      <item 	android:id="@+id/mnu_setting"
          	android:title="@string/mnuSettings"
-         	android:icon="@drawable/mnu_settings"
+         	android:icon="@drawable/ic_setting"
          	/>
 </menu>
