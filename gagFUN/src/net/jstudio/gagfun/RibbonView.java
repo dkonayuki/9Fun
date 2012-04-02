@@ -23,14 +23,16 @@ import android.widget.ViewAnimator;
 public class RibbonView extends ViewAnimator {	
 	private static final int MaxFirstImage = 3;
 	private static final int MaxLoadAhead = (int)(MaxFirstImage/2);
-	private Animation 	anim_InFromLeft,
+	public Animation 	anim_InFromLeft,
 						anim_InFromRight,
 						anim_InFromTop,
 						anim_InFromBot,
 						anim_OutToLeft,
 						anim_OutToRight,
 						anim_OutToTop,
-						anim_OutToBot;
+						anim_OutToBot,
+						anim_FadeIn,
+						anim_FadeOut;
 	
 	private NineGAG _nineGag;
 	private Queue<GagEntry> queue_Download;
@@ -61,14 +63,14 @@ public class RibbonView extends ViewAnimator {
 		layout.addView(img);
 		addView(layout,params);
 	}
+	
 	public boolean isDisplayedMenu(){
 		return menu_on;
 	}
 	public void createMenu(){
 		//Menu Top
 		menuTop = new LinearLayout(this.getContext());
-		menuTop.setBackgroundResource(R.drawable.title_bar);
-	    menuTop.setGravity(Gravity.RIGHT);
+	   // menuTop.setGravity(Gravity.RIGHT);
 		menuTop.setOrientation(LinearLayout.HORIZONTAL);
 		 //Reload Button
         ImageButton btt_Refresh= new ImageButton(this.getContext());
@@ -87,14 +89,14 @@ public class RibbonView extends ViewAnimator {
         //Title
 		m_Title = new TextView(this.getContext());
         m_Title.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-        m_Title.setTextColor(Color.WHITE);
+        m_Title.setTextColor(0xff222222);
         m_Title.setTextSize(20);
+        m_Title.setBackgroundResource(R.drawable.black_button_big2);
         menuTop.addView(m_Title,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT)); 
         
         //Menu Bottom
         menuBot = new LinearLayout(this.getContext());
         menuBot.setOrientation(LinearLayout.HORIZONTAL);
-        menuBot.setBackgroundResource(R.drawable.bar_bottom);
         //Like Button
         LinearLayout temp3= new LinearLayout(this.getContext());
         ImageButton btt_Like = new ImageButton(this.getContext());
@@ -103,10 +105,11 @@ public class RibbonView extends ViewAnimator {
         m_LikeNumber = new TextView(this.getContext());
         m_LikeNumber.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         m_LikeNumber.setText("--");
+        m_LikeNumber.setTextColor(0xff888888);
         m_LikeNumber.setTextSize(20);
         temp3.addView(btt_Like);
         temp3.addView(m_LikeNumber,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
-        menuBot.addView(temp3);
+        menuBot.addView(temp3,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         //Comment Button
         ImageButton btt_Comment = new ImageButton(this.getContext());
         btt_Comment.setImageResource(R.drawable.button_comment);
@@ -125,6 +128,7 @@ public class RibbonView extends ViewAnimator {
         LinearLayout temp2= new LinearLayout(this.getContext());
         temp2.addView(btt_Comment,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         temp2.setOrientation(LinearLayout.HORIZONTAL);
+        
         temp2.setGravity(Gravity.RIGHT);
         menuBot.addView(temp2,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 	}
@@ -233,6 +237,8 @@ public class RibbonView extends ViewAnimator {
 		anim_OutToRight = AnimationUtils.loadAnimation(ct, R.anim.outtoright);
 		anim_OutToBot = AnimationUtils.loadAnimation(ct, R.anim.outtobot);
 		anim_OutToTop= AnimationUtils.loadAnimation(ct, R.anim.outtotop);
+		anim_FadeIn = AnimationUtils.loadAnimation(ct, R.anim.fadein);
+		anim_FadeOut = AnimationUtils.loadAnimation(ct, R.anim.fadeout);
 	}
 	
 	public void goNext(){		
@@ -257,7 +263,6 @@ public class RibbonView extends ViewAnimator {
 			setInAnimation(anim_InFromRight);
 			setOutAnimation(anim_OutToLeft);
 			showNext();
-			
 		}		
 	}
 	

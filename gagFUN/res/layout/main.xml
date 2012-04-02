@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:id="@+id/frame"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    >
 
+
+        <ImageButton
+            android:id="@+id/btt_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:src="@drawable/button_next" 
+            />
         
+        <ImageButton
+            android:id="@+id/btt_pre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|left"
+            android:src="@drawable/button_previous" 
+            />
 
-    <FrameLayout
-        android:id="@+id/frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-		
+   
 
-
-        <RelativeLayout
-            android:id="@+id/top_menu"
-            android:layout_width="match_parent"
-            android:layout_height="121dp" >
-        </RelativeLayout>
-
-    </FrameLayout>
-
-</LinearLayout>
+</FrameLayout>
