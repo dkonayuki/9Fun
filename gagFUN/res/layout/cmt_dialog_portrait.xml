@@ -41,26 +41,30 @@
 		        </TableRow>        
 		    </TableLayout>
 		</TableRow>
-		<TableRow>
+		<TableRow
+		    android:id="@+id/cmtdialog_bellowline">
 				<TableLayout	
 				    android:layout_width="wrap_content" 
 					android:layout_height="wrap_content">
 				    <TableRow>            
-			            <ImageView 
+			            <ImageView
 			                android:src="@drawable/cmtdialog_bottomleft"
 			                android:scaleType="fitXY"
 			                android:layout_width="10dp"
-			                android:layout_height="10dp"/>
-			            <ImageView 
+			                android:layout_height="10dp"
+			                />
+			            <ImageView
 			                android:src="@drawable/cmtdialog_bar"
 			                android:scaleType="fitXY"
 			                android:layout_width="235dp"
-			                android:layout_height="10dp"/>
-			            <ImageView 
+			                android:layout_height="10dp"
+			                />
+			            <ImageView
 			                android:src="@drawable/cmtdialog_bottomright"
 			                android:scaleType="fitXY"
 			                android:layout_width="24.5dp"
-			                android:layout_height="36dp"/>
+			                android:layout_height="36dp"
+			                />
 			            
 			        </TableRow>
 				</TableLayout>

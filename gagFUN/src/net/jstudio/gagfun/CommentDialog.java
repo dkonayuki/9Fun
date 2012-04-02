@@ -7,10 +7,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Surface;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.TableRow;
 
 
 public class CommentDialog extends Dialog {
@@ -66,6 +69,9 @@ public class CommentDialog extends Dialog {
 		//WebView
 		setUpWebView();
 		m_cmtView.loadUrl(m_URL);
+		
+		//Edge
+		setUpEdgeEvent();
 	}
 	
 	private void setUpWebView(){
@@ -83,7 +89,18 @@ public class CommentDialog extends Dialog {
 			}			
 		});
 	}
-	public void setPosition(int x, int y){m_px = x; m_py = y;}
 	
+	private void setUpEdgeEvent(){
+		TableRow tbr_belowLine = (TableRow)this.findViewById(R.id.cmtdialog_bellowline);
+		if(tbr_belowLine != null){
+			tbr_belowLine.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+		}
+	}
+	public void setPosition(int x, int y){m_px = x; m_py = y;}
 	
 }
