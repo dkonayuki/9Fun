@@ -19,7 +19,7 @@ import android.util.Log;
 
 public class GagEntry {
 	private int _id;
-	private String _entryName, _entryUrl, _linkImg;
+	private String _entryName, _entryUrl, _linkImg, _loveCount;
 	private EntryType _type;
 	private boolean _isDownloaded;
 	private Bitmap m_bmp;
@@ -27,9 +27,12 @@ public class GagEntry {
 	private List<DownloadFinishedListener> dlFinishListener;
 	private DownloadImageTask dlTask;
 	
-	//Number of likes
-	private GetCallback gcbLikes = null;
+	//Number of likes, loves
+	private GetCallback gcbLikes = null, gcbLoves = null;
 	private GetNumberOfLikesTask likesTask = null;
+	private GetNumberOfLovesTask lovesTask = null;
+	
+	
 	private static final String likeapi_begin = "http://api.facebook.com/method/fql.query?query=select%20total_count%20from%20link_stat%20where%20url=%279";
 	private static final String likeapi_end = "%27&format=json";
 	private static final String fbcommentapi = "http://www.facebook.com/plugins/comments.php?href=";
@@ -39,6 +42,7 @@ public class GagEntry {
 			String entryName,
 			String entryUrl,
 			String link,
+			String loveCount,
 			EntryType type
 			){
 		_httpClient = client;
@@ -46,6 +50,7 @@ public class GagEntry {
 		this._entryName = entryName;		
 		this._entryUrl = entryUrl;this._type = type;
 		this._linkImg = link;
+		this._loveCount = loveCount;
 		_isDownloaded = false;
 		dlFinishListener = new ArrayList<DownloadFinishedListener>();
 	}	
@@ -58,7 +63,7 @@ public class GagEntry {
 	public boolean isDownloaded(){return _isDownloaded;}
 	public Bitmap getBitmap(){return m_bmp;}
 	public String getFBCommentLink(){return fbcommentapi + _entryUrl;}
-	
+	public String getLoveCount(){return _loveCount;}
 	
 	public void StartDownloadBitmap(){
 		if(!_isDownloaded){
@@ -80,20 +85,76 @@ public class GagEntry {
 		_isDownloaded = false;
 	}
 	
+	public boolean isNSFW(){
+		return _linkImg.contains("gag") || _linkImg.contains("nsfw-mask");
+	}
 	
 	public synchronized void addDownloadFinished(DownloadFinishedListener dl){
 		dlFinishListener.add(dl);
 	}
+
+	public interface GetCallback{
+		public void OnGetCallBackInt(int value);
+	}
 	
+	public void getLovesRealTime(GetCallback gcb){
+		gcbLoves = gcb;
+		if(lovesTask != null && lovesTask.getStatus() == AsyncTask.Status.RUNNING){
+			lovesTask.cancel(true);
+			lovesTask = null;
+		}
+		lovesTask = new GetNumberOfLovesTask();
+		lovesTask.execute(_entryUrl, Integer.toString(_id));
+	}
+	
+	private class GetNumberOfLovesTask extends AsyncTask<String, Void, Integer>{
+
+		@Override
+		protected Integer doInBackground(String... params) {
+			Integer re = null;
+			try{
+				String currentID = params[1];
+				HttpUriRequest request = new HttpGet(params[0]);				
+				HttpResponse response = _httpClient.execute(request);
+				HttpEntity entity = response.getEntity();
+				if(entity != null){
+					StringBuilder str_b = new StringBuilder();
+					InputStream in = entity.getContent();
+					int i;
+					while(( i = in.read()) != -1)
+						str_b.append((char)i);					
+					String str = str_b.toString();
+					//
+					String strFind = "love_count_" + currentID;
+					int f1 = str.indexOf(strFind);
+					f1 += strFind.length();
+					f1 = str.indexOf(">", f1);
+					int f2 = str.indexOf("<", f1);
+					return Integer.parseInt(str.substring(f1 + 1, f2));
+				}
+			}catch(Exception e){
+				re = Integer.parseInt(_loveCount);
+			}
+			return re;
+		}
+
+		@Override     
+		protected void onPostExecute(Integer result) {
+			if(gcbLoves != null){
+				gcbLoves.OnGetCallBackInt(result.intValue());
+				_loveCount = result.toString();
+			}
+		}
+		
+		
+	}
 	public void getLikes(GetCallback gcb){
 		gcbLikes = gcb;
 		likesTask = new GetNumberOfLikesTask();
 		String sRequest = likeapi_begin + _entryUrl + likeapi_end;
 		likesTask.execute(sRequest);
 	}
-	public interface GetCallback{
-		public void OnGetCallBackInt(int value);
-	}
+
 	private class GetNumberOfLikesTask extends AsyncTask<String, Void, Integer>{
 
 		@Override

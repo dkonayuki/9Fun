@@ -6,14 +6,20 @@ import net.jstudio.gagCore.EntryType;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Movie;
 
 public class PublicResource {
 	private static final String sLoadingFileName = "loading.gif";
 	private static final String sLoadingDown = "Down.gif";
+	private static final String sNSFW = "nsfw.jpg";
 	private static Movie m_LoadingMovie = null;
 	private static Movie m_Down = null;
+	private static Bitmap m_NSFW = null;
 	
+	public static Bitmap NSFWBitmap(){return m_NSFW;}
 	public static Movie LoadingMovie(){return m_LoadingMovie;}
 	public static Movie LoadingDown(){return m_Down;}
 	public static void LoadResource(Context ct){
@@ -22,6 +28,12 @@ public class PublicResource {
 			m_LoadingMovie = Movie.decodeStream(ct.getAssets().open(sLoadingFileName));
 			m_Down = Movie.decodeStream(ct.getAssets().open(sLoadingDown));
 		} catch (IOException e) {}
+		//Load NSFW
+		AssetManager amng = ct.getAssets();
+		try {
+			m_NSFW = BitmapFactory.decodeStream(amng.open(sNSFW));
+		} catch (IOException e) {
+		}
 	}
 	
 	private static final String sPrefName = "PrefName";

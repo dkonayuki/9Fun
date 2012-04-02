@@ -121,12 +121,15 @@ public class NineGAG {
 				for(int j = 0; j < json_items.length(); j++)					
 					strb.append(json_items.getString("entry-" + arr.getInt(j)));
 				
-				if(type == EntryType.DISCOVER)
+				if(type == EntryType.DISCOVER){
 					l_discover.addAll(produceEntriesFromString(strb.toString(), type));
-				else if(type == EntryType.TRENDING)
+				}
+				else if(type == EntryType.TRENDING){
 					l_trending.addAll(produceEntriesFromString(strb.toString(), type));
-				else
-					l_hot.addAll(produceEntriesFromString(strb.toString(), type));				
+				}
+				else{
+					l_hot.addAll(produceEntriesFromString(strb.toString(), type));
+				}
 				
 			} catch (JSONException e) {				
 				e.printStackTrace();
@@ -196,7 +199,15 @@ public class NineGAG {
 			int f2 = str.indexOf("\"", f1);			
 			String link = str.substring(f1, f2); 
 		
-			list_entry.add(new GagEntry(httpclient, id, name, url, link, type));
+			//Add get love_count
+			strFind = "id=\"love_count_" + Integer.toString(id) + "\"";
+			f1 = str.indexOf(strFind);
+			f1 += strFind.length();
+			f1 = str.indexOf(">", f1);
+			f2 = str.indexOf("<", f1);
+			String loveCount = str.substring(f1 + 1, f2);
+			
+			list_entry.add(new GagEntry(httpclient, id, name, url, link, loveCount, type));
 		}
 		return list_entry;
 	}
@@ -255,7 +266,8 @@ public class NineGAG {
 		ID,
 		NAME,
 		URL,
-		IMGLINK
+		IMGLINK,
+		LOVECOUNT
 	}
 	private String getJSONString(EntryType type){
 		JSONArray array = new JSONArray();
@@ -275,6 +287,7 @@ public class NineGAG {
 				js_item.put(DataToFile.NAME.toString(), entry.getEntryName());
 				js_item.put(DataToFile.URL.toString(), entry.getEntryUrl());
 				js_item.put(DataToFile.IMGLINK.toString(), entry.getLink());
+				js_item.put(DataToFile.LOVECOUNT.toString(), entry.getLoveCount());
 				array.put(js_item.toString());
 			} catch (JSONException e) {				
 			}				
@@ -319,6 +332,7 @@ public class NineGAG {
 							js_item.getString(DataToFile.NAME.toString()),
 							js_item.getString(DataToFile.URL.toString()),
 							js_item.getString(DataToFile.IMGLINK.toString()),
+							js_item.getString(DataToFile.LOVECOUNT.toString()),
 							EntryType.HOT
 							));
 				}
@@ -331,8 +345,10 @@ public class NineGAG {
 							js_item.getString(DataToFile.NAME.toString()),
 							js_item.getString(DataToFile.URL.toString()),
 							js_item.getString(DataToFile.IMGLINK.toString()),
+							js_item.getString(DataToFile.LOVECOUNT.toString()),
 							EntryType.TRENDING
 							));
+
 				}
 			} catch (JSONException e) {				
 			}
