@@ -134,12 +134,15 @@ public class RibbonView extends ViewAnimator {
 		GagEntry entry = getCurrentEntry();
 		menu_on=true;		
 		m_Title.setText(entry.getEntryName());
-		entry.getLikes(new GagEntry.GetCallback() {
+		m_LikeNumber.setText(entry.getLoveCount());
+		
+		entry.getLovesRealTime(new GagEntry.GetCallback() {
 			
 			public void OnGetCallBackInt(int value) {
 				m_LikeNumber.setText(String.valueOf(value));				
 			}
-		});		
+		});
+				
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));
 		((ViewGroup) this.getCurrentView()).addView(menuBot,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
 		menuTop.startAnimation(anim_InFromTop);
@@ -158,11 +161,13 @@ public class RibbonView extends ViewAnimator {
 		}
 	}
 	
-	private void addEntryToDownloadQueue(GagEntry entry){		
-		queue_Download.add(entry);
-		if(queue_Download.size() == 1){
-			queue_Download.poll();
-			entry.StartDownloadBitmap();
+	private void addEntryToDownloadQueue(GagEntry entry){	
+		if(!entry.isNSFW()){
+			queue_Download.add(entry);
+			if(queue_Download.size() == 1){
+				queue_Download.poll();
+				entry.StartDownloadBitmap();
+			}
 		}
 	}
 

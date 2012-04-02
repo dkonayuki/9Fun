@@ -11,8 +11,6 @@ import android.view.View;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-
-
 public class EntryImgView extends View {	
 	private static final double MaxAngleForFling = 0.707106781;//sin(pi/4) 
 	private ScaleGestureDetector _scaleDetector;
@@ -54,7 +52,11 @@ public class EntryImgView extends View {
 	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if(!_gagEntry.isDownloaded()){			
+			
+		if(_gagEntry.isNSFW()){
+			FixImageSize(getWidth(), getHeight());    
+			canvas.drawBitmap(PublicResource.NSFWBitmap(), r_img.getSrcRect(),r_img.getDstRect(), null);
+		}else if(!_gagEntry.isDownloaded()){			
 			canvas.drawColor(Color.TRANSPARENT);
 			long now = SystemClock.uptimeMillis();
 			if(lStartImageLoading == 0)
@@ -85,7 +87,12 @@ public class EntryImgView extends View {
 	
 	
 	private void FixImageSize(int w, int h){
-		r_img = new TransformRect(_gagEntry.getBitmap().getWidth(), 
+		if(_gagEntry.isNSFW())
+			r_img = new TransformRect(PublicResource.NSFWBitmap().getWidth(),
+									PublicResource.NSFWBitmap().getHeight(),
+									w, h);
+		else
+			r_img = new TransformRect(_gagEntry.getBitmap().getWidth(), 
 								_gagEntry.getBitmap().getHeight(),
 								w, h);
 		r_img.setMaxScale(3.f);
