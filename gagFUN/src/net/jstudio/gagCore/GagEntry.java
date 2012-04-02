@@ -86,7 +86,7 @@ public class GagEntry {
 	}
 	
 	public boolean isNSFW(){
-		return _linkImg.contains("gag") || _linkImg.contains("nsfw-mask");
+		return !_linkImg.contains("jpg");
 	}
 	
 	public synchronized void addDownloadFinished(DownloadFinishedListener dl){
