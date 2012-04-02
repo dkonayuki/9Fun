@@ -74,9 +74,15 @@ public class RibbonView extends ViewAnimator {
         ImageButton btt_Refresh= new ImageButton(this.getContext());
         btt_Refresh.setBackgroundColor(Color.TRANSPARENT);
         btt_Refresh.setImageResource(R.drawable.button_refresh);
+        btt_Refresh.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View v) {				
+				RibbonView.this.Reset();
+			}        	
+        });
         LinearLayout temp= new LinearLayout(this.getContext());
         temp.addView(btt_Refresh,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
-        menuTop.addView(temp,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+        menuTop.addView(temp,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));        
        
         //Title
 		m_Title = new TextView(this.getContext());
@@ -140,11 +146,16 @@ public class RibbonView extends ViewAnimator {
 		menuBot.startAnimation(anim_InFromBot);
 	}
 	public void hideMenu(){
-		menu_on=false;
-		menuTop.startAnimation(anim_OutToTop);
-		menuBot.startAnimation(anim_OutToBot);
-		((ViewGroup) this.getCurrentView()).removeView(menuTop);
-		((ViewGroup) this.getCurrentView()).removeView(menuBot);
+		menu_on=false;				
+		ViewGroup currentMenu = ((ViewGroup) this.getCurrentView());
+		if(currentMenu.indexOfChild(menuTop) != -1){
+			menuTop.startAnimation(anim_OutToTop);
+			((ViewGroup) this.getCurrentView()).removeView(menuTop);
+		}
+		if(currentMenu.indexOfChild(menuBot) != -1){
+			menuBot.startAnimation(anim_OutToBot);
+			((ViewGroup) this.getCurrentView()).removeView(menuBot);
+		}
 	}
 	
 	private void addEntryToDownloadQueue(GagEntry entry){		
@@ -155,6 +166,27 @@ public class RibbonView extends ViewAnimator {
 		}
 	}
 
+	public void Reset(){
+		_nineGag.Reset(m_type);
+		PublicResource.setPrefCurrentView(getContext(), m_type, 0);
+		//Remove menu if exist
+		hideMenu();
+		removeAllViews();
+		setUpLoadFirstEntry();
+	}
+	
+	private void setUpLoadFirstEntry(){
+		_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
+			
+			public void OnLoadFirstEntriesFinished() {
+				for(int i = 0; i < MaxFirstImage; i++){
+					addNewView(_nineGag.getList(m_type).get(i), true);					
+				}		
+			}
+		});		
+		_nineGag.StartDownloadFirstPage(m_type);
+	}
+	
 	public RibbonView(Context ct, EntryType type, NineGAG nineGag) {
 		super(ct);	
 		createMenu();
@@ -166,17 +198,9 @@ public class RibbonView extends ViewAnimator {
 	
 		//Set event download finish for 9Gag
 		_nineGag = nineGag;
-			List<GagEntry> l_entry = nineGag.getList(m_type);
+		List<GagEntry> l_entry = nineGag.getList(m_type);
 		if(l_entry.size() == 0){		
-			_nineGag.setLoadFirstEntriesFinished(new NineGAG.LoadFirstEntriesFinishedListener() {
-				
-				public void OnLoadFirstEntriesFinished() {
-					for(int i = 0; i < MaxFirstImage; i++){
-						addNewView(_nineGag.getList(m_type).get(i), true);					
-					}		
-				}
-		});		
-			_nineGag.StartDownloadFirstPage(m_type);
+			setUpLoadFirstEntry();
 		}else{		
 			int iCurrentView = PublicResource.getPrefCurrentView(ct, m_type);
 			//Simulate Next

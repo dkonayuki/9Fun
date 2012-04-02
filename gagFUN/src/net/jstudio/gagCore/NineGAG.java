@@ -71,6 +71,18 @@ public class NineGAG {
 	}
 	
 	public void setLoadFirstEntriesFinished(LoadFirstEntriesFinishedListener finished){loadFinished = finished;}
+	public void Reset(EntryType type){
+		switch(type){
+			case HOT:
+				point_hot = 0;
+				l_hot.clear();				
+				break;
+			case TRENDING:
+				point_trending = 0;
+				l_trending.clear();				
+				break;
+		}
+	}
 	
 	public HttpClient getHttpClient(){return httpclient;}
 	private void updateNewEntries(EntryType type) throws ClientProtocolException, IOException{

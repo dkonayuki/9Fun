@@ -131,7 +131,8 @@ public class GagFUN extends Activity {
 	@Override
 	protected void onDestroy() {		
 		super.onDestroy();
-		_nineGag.SaveDataToStorage();
+		if(_nineGag != null)
+			_nineGag.SaveDataToStorage();
 		if(rbV_hot != null){
 			PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
 			rbV_hot.DisposeAllDialog();
