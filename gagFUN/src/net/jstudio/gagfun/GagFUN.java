@@ -206,17 +206,6 @@ public class GagFUN extends Activity {
 
 	@Override
 	protected void onResume() {
-		//Fix android bugs
-		setUpOnScreenButtonMode();
-		Handler hl = new Handler();
-		hl.postDelayed(new Runnable(){
-
-			public void run() {
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			}
-			
-		}, 500);
-		
 		//Check internet is available
         if(!CheckIfInternetIsAvailable()){
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -230,17 +219,31 @@ public class GagFUN extends Activity {
         	alert.show();
         }
 		super.onResume();
+		//Fix android bugs
+		setUpOnScreenButtonMode();
+		Handler hl = new Handler();
+		hl.postDelayed(new Runnable(){
+
+			public void run() {
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			}
+			
+		}, 500);
+		
+		
 	}
     
 	private void setUpOnScreenButtonMode(){
-		if(PublicResource.getPrefTouchMode(this)){
-			btt_previous.setVisibility(View.VISIBLE);
-			btt_next.setVisibility(View.VISIBLE);	
-			btt_next.bringToFront();
-			btt_previous.bringToFront();
-		}else{
-			btt_next.setVisibility(View.INVISIBLE);
-			btt_previous.setVisibility(View.INVISIBLE);
+		if(btt_previous != null && btt_next != null){
+			if(PublicResource.getPrefTouchMode(this)){
+				btt_previous.setVisibility(View.VISIBLE);
+				btt_next.setVisibility(View.VISIBLE);	
+				btt_next.bringToFront();
+				btt_previous.bringToFront();
+			}else{
+				btt_next.setVisibility(View.INVISIBLE);
+				btt_previous.setVisibility(View.INVISIBLE);
+			}
 		}
 	}
 }
