@@ -87,12 +87,14 @@ public class RibbonView extends ViewAnimator {
         menuTop.addView(temp,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));        
        
         //Title
+        LinearLayout temp4 = new LinearLayout(this.getContext());
 		m_Title = new TextView(this.getContext());
         m_Title.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         m_Title.setTextColor(0xff222222);
         m_Title.setTextSize(20);
         m_Title.setBackgroundResource(R.drawable.black_button_big2);
-        menuTop.addView(m_Title,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT)); 
+        temp4.addView(m_Title,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL));
+        menuTop.addView(temp4,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT)); 
         
         //Menu Bottom
         menuBot = new LinearLayout(this.getContext());
@@ -145,8 +147,7 @@ public class RibbonView extends ViewAnimator {
 			public void OnGetCallBackInt(int value) {
 				m_LikeNumber.setText(String.valueOf(value));				
 			}
-		});
-				
+		});			
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));
 		((ViewGroup) this.getCurrentView()).addView(menuBot,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
 		menuTop.startAnimation(anim_InFromTop);
