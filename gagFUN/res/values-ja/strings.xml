@@ -18,4 +18,5 @@
 	<string name="buttonModeSub">画面ボータン切り替え</string>
 	<string name="NextVersion">私たちはこの機能を開発中なので、そこまでお待ちください。</string>
 	<string name="SupportUs">Thank you for your coming back! Please support us by clicking advertisement!</string>
+	<string name="no_img">リフレッシュする必要があります。あるいは最新の映像につきました。</string>
 </resources>
