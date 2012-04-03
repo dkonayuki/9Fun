@@ -76,7 +76,7 @@ public class EntryImgView extends View {
 						lStartImageLoading2 = now2;
 					int relTime = (int)(now2 - lStartImageLoading2) % PublicResource.LoadingDown().duration();
 					PublicResource.LoadingDown().setTime(relTime);	
-					PublicResource.LoadingDown().draw(canvas, (this.getWidth() - PublicResource.LoadingDown().width())/2, (this.getHeight() - PublicResource.LoadingDown().height())/2+360);		
+					PublicResource.LoadingDown().draw(canvas, (this.getWidth() - PublicResource.LoadingDown().width())/2, (this.getHeight() - PublicResource.LoadingDown().height())/2+340);		
 					invalidate();
 				
 			}

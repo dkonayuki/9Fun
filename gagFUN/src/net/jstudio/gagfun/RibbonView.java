@@ -92,7 +92,7 @@ public class RibbonView extends ViewAnimator {
         m_Title.setTextColor(0xff222222);
         m_Title.setTextSize(20);
         m_Title.setBackgroundResource(R.drawable.black_button_big2);
-        menuTop.addView(m_Title,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT)); 
+        menuTop.addView(m_Title,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT)); 
         
         //Menu Bottom
         menuBot = new LinearLayout(this.getContext());

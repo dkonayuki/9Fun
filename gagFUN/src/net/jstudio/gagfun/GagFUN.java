@@ -199,8 +199,6 @@ public class GagFUN extends Activity {
 			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
 			rbV_trending.DisposeAllDialog();
 		}
-		
-		
 	}
 
 
