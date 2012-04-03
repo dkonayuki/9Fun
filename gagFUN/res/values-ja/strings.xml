@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">9GagFun</string>
+    <string name="app_name">9Fun</string>
     <string name="InternetIsNotAvailable">申し訳ございませんが、このアプリはネットが必要です。</string>
 	<string name="Loading">ロード中</string>
 	<string name="OK">はい</string>
