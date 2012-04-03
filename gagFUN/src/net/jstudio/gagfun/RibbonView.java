@@ -264,13 +264,10 @@ public class RibbonView extends ViewAnimator {
 		
 		//Animation
 		if(iDisplayedChild != iChildCount - 1){
+			if (isDisplayedMenu()) hideMenu();
 			setInAnimation(anim_InFromRight);
 			setOutAnimation(anim_OutToLeft);
-			if (isDisplayedMenu()) {
-				hideMenu();
-				showNext();
-				displayMenu();
-			}else showNext();
+			showNext();
 		}		
 	}
 	
@@ -287,12 +284,8 @@ public class RibbonView extends ViewAnimator {
 		if(iDisplayedChild != 0){
 			setInAnimation(anim_InFromLeft);
 			setOutAnimation(anim_OutToRight);
-			if (isDisplayedMenu()) {
-				hideMenu();
-				showPrevious();
-				displayMenu();
-			}else showPrevious();
-			
+			if (isDisplayedMenu()) hideMenu();
+			showPrevious();
 		}
 	}
 
