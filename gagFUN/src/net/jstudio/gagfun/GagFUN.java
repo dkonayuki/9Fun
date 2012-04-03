@@ -1,5 +1,6 @@
 package net.jstudio.gagfun;
 
+
 import net.jstudio.gagCore.EntryType;
 import net.jstudio.gagCore.NineGAG;
 import android.app.Activity;
@@ -11,11 +12,11 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
@@ -28,6 +29,7 @@ public class GagFUN extends Activity {
 	private NineGAG _nineGag;	
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +46,7 @@ public class GagFUN extends Activity {
         	alert.show();
         	return;
         }        
-      
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	    setContentView(R.layout.main);
 	    layout = (FrameLayout)findViewById(R.id.frame); 
@@ -71,7 +72,8 @@ public class GagFUN extends Activity {
 	 
     }
     
-    public void showOnScreenButton(){
+
+	public void showOnScreenButton(){
 		//button next
 		btt_next = (ImageButton)findViewById(R.id.btt_next);
 		btt_next.setBackgroundColor(Color.TRANSPARENT);
@@ -201,6 +203,21 @@ public class GagFUN extends Activity {
 		}
 		
 		
+	}
+
+
+	@Override
+	protected void onResume() {
+		//Fix android bugs
+		Handler hl = new Handler();
+		hl.postDelayed(new Runnable(){
+
+			public void run() {
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			}
+			
+		}, 500);
+		super.onResume();
 	}
     
 }

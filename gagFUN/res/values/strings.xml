@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, GagFUNActivity!</string>
-    <string name="app_name">9Gag</string>
+    <string name="app_name">9GagFun</string>
     <string name="InternetIsNotAvailable">Sorry! This application can not be run without Internet!</string>
 	<string name="Loading">Loading&#8230;</string>
 	<string name="OK">OK</string>
@@ -18,5 +17,5 @@
 	<string name="buttonModeTitle">Use Onscreen Button </string>
 	<string name="buttonModeSub">Use the quick button on screen to view</string>
 	<string name="NextVersion">We are working hard for this feature, please wait for the next coming version.</string>
-	
+	<string name="SupportUs">Thank you for your coming back! Please support us by clicking advertisement!</string>
 </resources>
