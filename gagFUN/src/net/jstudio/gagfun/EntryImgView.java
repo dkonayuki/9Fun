@@ -167,21 +167,23 @@ public class EntryImgView extends View {
 
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
-			if(_gagEntry.isDownloaded()){
-				//Check if whether the fling's angle is bellow MaxAngleForFling
-				boolean bAngle = (Math.abs(velocityY)/Math.sqrt(velocityX*velocityX + velocityY*velocityY) <= MaxAngleForFling);
-				if(bAngle){
-					if(velocityX < 0 && r_img.canGoNext()){
-						m_rbV.goNext();				
-					}else if (velocityX >= 0 && r_img.canGoPrevious()){
-						m_rbV.goPrevious();				
-					}			
+			if(!PublicResource.getPrefTouchMode(EntryImgView.this.getContext())){
+				if(_gagEntry.isDownloaded()){
+					//Check if whether the fling's angle is bellow MaxAngleForFling
+					boolean bAngle = (Math.abs(velocityY)/Math.sqrt(velocityX*velocityX + velocityY*velocityY) <= MaxAngleForFling);
+					if(bAngle){
+						if(velocityX < 0 && r_img.canGoNext()){
+							m_rbV.goNext();				
+						}else if (velocityX >= 0 && r_img.canGoPrevious()){
+							m_rbV.goPrevious();				
+						}			
+					}
+				}else{
+					if(velocityX < 0)
+						m_rbV.goNext();
+					else
+						m_rbV.goPrevious();
 				}
-			}else{
-				if(velocityX < 0)
-					m_rbV.goNext();
-				else
-					m_rbV.goPrevious();
 			}
 			return true;
 		}

@@ -10,6 +10,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Movie;
+import android.preference.PreferenceManager;
 
 public class PublicResource {
 	private static final String sLoadingFileName = "loading.gif";
@@ -39,7 +40,9 @@ public class PublicResource {
 	private static final String sPrefName = "PrefName";
 	private static final String sCurrent_HOT = "CurrentHOT";
 	private static final String sCurrent_TRENDING = "CurrentTRENDING";
-	private static final String sCurrent_Page = "CurrentPage";	
+	private static final String sCurrent_Page = "CurrentPage";
+	private static final String sTouchMode = "touchMode";
+	
 	public static EntryType getPrefCurrentPage(Context ct){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
 		int i = pref.getInt(sCurrent_Page, 0);
@@ -85,5 +88,10 @@ public class PublicResource {
 				break;
 		}		
 		editor.commit();
+	}
+	
+	public static boolean getPrefTouchMode(Context ct){
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ct);
+		return pref.getBoolean(sTouchMode, false);
 	}
 }

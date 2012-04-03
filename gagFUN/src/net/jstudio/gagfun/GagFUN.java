@@ -2,22 +2,17 @@ package net.jstudio.gagfun;
 
 
 import net.jstudio.gagCore.EntryType;
-import android.preference.CheckBoxPreference;
 import net.jstudio.gagCore.NineGAG;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.preference.Preference;
-import android.preference.PreferenceGroup;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,7 +29,6 @@ public class GagFUN extends Activity {
 	private NineGAG _nineGag;	
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
-	private boolean onscreenButton_on=false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +52,6 @@ public class GagFUN extends Activity {
 	    layout = (FrameLayout)findViewById(R.id.frame); 
 	    layout.setBackgroundColor(Color.BLACK);
 	    onCreateOnScreenButton();
-	    checkPreference();
 		PublicResource.LoadResource(this);
         _nineGag = new NineGAG(this);        
         if(!_nineGag.LoadDataFromFile()){//IF fail to load data, reset all variable to 0
@@ -78,13 +71,6 @@ public class GagFUN extends Activity {
         }    
 	 
     }
-    
-    public boolean isDisplayedOnScreenButton(){
-    	return onscreenButton_on;
-    }
-    public void setOnScreenButton(boolean b){
-    	onscreenButton_on = b;
-    }
     public void onCreateOnScreenButton(){
     	//button next
     	btt_next = (ImageButton)findViewById(R.id.btt_next);
@@ -97,19 +83,6 @@ public class GagFUN extends Activity {
 		btt_previous.setAlpha(60);
     }
     
-	public void showOnScreenButton(){
-		setOnScreenButton(true);
-		btt_previous.setVisibility(View.VISIBLE);
-		btt_next.setVisibility(View.VISIBLE);	
-		btt_next.bringToFront();
-		btt_previous.bringToFront();
-	}
-	
-	public void removeOnScreenButton(){
-		setOnScreenButton(false);
-		btt_next.setVisibility(View.INVISIBLE);
-		btt_previous.setVisibility(View.INVISIBLE);
-	}
     
     private void setOnClickButton(final RibbonView rbV ){
     	btt_next.setOnClickListener(new OnClickListener(){
@@ -212,16 +185,6 @@ public class GagFUN extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
     
-	private void checkPreference() {
-		
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sharedPrefs.getBoolean("touchMode", false)){
-			showOnScreenButton();
-		} else {
-			removeOnScreenButton();
-		}
-	}
-
 
 	@Override
 	protected void onDestroy() {		
@@ -244,7 +207,7 @@ public class GagFUN extends Activity {
 	@Override
 	protected void onResume() {
 		//Fix android bugs
-		checkPreference();
+		setUpOnScreenButtonMode();
 		Handler hl = new Handler();
 		hl.postDelayed(new Runnable(){
 
@@ -269,4 +232,15 @@ public class GagFUN extends Activity {
 		super.onResume();
 	}
     
+	private void setUpOnScreenButtonMode(){
+		if(PublicResource.getPrefTouchMode(this)){
+			btt_previous.setVisibility(View.VISIBLE);
+			btt_next.setVisibility(View.VISIBLE);	
+			btt_next.bringToFront();
+			btt_previous.bringToFront();
+		}else{
+			btt_next.setVisibility(View.INVISIBLE);
+			btt_previous.setVisibility(View.INVISIBLE);
+		}
+	}
 }

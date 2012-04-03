@@ -11,7 +11,7 @@ public class Preference extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.layout.preference);
         CheckBoxPreference safeMode = (CheckBoxPreference) findPreference("safeMode");
-        safeMode.setChecked(true);
+        safeMode.setEnabled(false);
     }
  
 }
