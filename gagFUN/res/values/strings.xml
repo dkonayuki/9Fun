@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">9GagFun</string>
+    <string name="app_name">9Gag</string>
     <string name="InternetIsNotAvailable">Sorry! This application can not be run without Internet!</string>
 	<string name="Loading">Loading&#8230;</string>
 	<string name="OK">OK</string>
