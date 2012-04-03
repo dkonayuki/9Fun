@@ -5,7 +5,7 @@
         android:key="first_category">
     
   <CheckBoxPreference android:title="@string/safeModeTitle"
-                      android:defaultValue="false"
+                      android:defaultValue="true"
                       android:summary="@string/safeModeSub"
                       android:key="safeMode" />
   </PreferenceCategory>
