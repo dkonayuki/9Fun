@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class GagFUN extends Activity {
     /** Called when the activity is first created. */
@@ -93,6 +94,8 @@ public class GagFUN extends Activity {
 		btt_next.startAnimation(rbV.anim_FadeIn);
 		btt_previous.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
+				if (rbV.indexOfChild(rbV.getCurrentView())==0) 
+					Toast.makeText(getBaseContext(), R.string.no_img, Toast.LENGTH_SHORT).show();
 				rbV.goPrevious();
 			}
 			
