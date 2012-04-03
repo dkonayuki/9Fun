@@ -217,6 +217,19 @@ public class GagFUN extends Activity {
 			}
 			
 		}, 500);
+		
+		//Check internet is available
+        if(!CheckIfInternetIsAvailable()){
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	builder.setMessage(R.string.InternetIsNotAvailable)
+        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
+						public void onClick(DialogInterface dialog, int which) {
+							GagFUN.this.finish();							
+						}
+					});
+        	AlertDialog alert = builder.create();
+        	alert.show();
+        }
 		super.onResume();
 	}
     

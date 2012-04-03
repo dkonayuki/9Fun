@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">9GagFun</string>
+    <string name="InternetIsNotAvailable">申し訳ないが、このアプリはインターネットが必要です。</string>
+	<string name="Loading">ロード中&#8230;</string>
+	<string name="OK">はい</string>
+	<string name="mnuChoosePage">ページ選択</string>
+	<string name="mnuSettings">オプション</string>
+	<string name="mnuHot">ホットページ</string>
+	<string name="mnuTrending">傾向ページ</string>
+	<string name="mnuLogin">ログイン</string>
+	<string name="stSafemode">セーフモード</string>
+	<string name="safeModeTitle">セーフモード</string>
+	<string name="safeModeSub">セーフモードを可能にする設定</string>
+	<string name="scrollModeTitle">スクロールモード</string>
+	<string name="scrollModeSub">Scroll to view</string>
+	<string name="buttonModeTitle">画面上のボータンを利用</string>
+	<string name="buttonModeSub">イメージをブラウズするのをクックボータンで利用する設定</string>
+	<string name="NextVersion">私たちはこの機能を開発中なので、そこまでお待ちくださいませ。</string>
+	<string name="SupportUs">Thank you for your coming back! Please support us by clicking advertisement!</string>
+</resources>
