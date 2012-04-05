@@ -12,7 +12,7 @@
                 ads:adUnitId="a14f79f80b81d49"
                 ads:adSize="BANNER"
                 ads:testDevices="TEST_EMULATOR, 3733A6295C5C00EC"
-                ads:loadAdOnCreate="true"
+                ads:loadAdOnCreate="false"
                 android:layout_gravity="center_horizontal|top"
 	/>  
 	<FrameLayout 

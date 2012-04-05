@@ -173,6 +173,20 @@ public class GagFUN extends Activity {
 					startActivity(new Intent("net.jstudio.Preference"));
 				}return true;
 				case R.id.mnu_login:{
+					_nineGag.Login("khanhnv90", "abcd1234", new NineGAG.ProcessLoginFinishedListener() {
+						
+						public void OnProcessLoginFinished(boolean Success, boolean SafeMode) {
+							AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
+				        	builder.setMessage(String.valueOf(Success)+"--"+String.valueOf(SafeMode))
+				        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
+										public void onClick(DialogInterface dialog, int which) {						
+										}
+									});
+				        	AlertDialog alert = builder.create();
+				        	alert.show();
+						}
+					});
+					/*
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		        	builder.setMessage(R.string.NextVersion)
 		        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
@@ -181,6 +195,7 @@ public class GagFUN extends Activity {
 							});
 		        	AlertDialog alert = builder.create();
 		        	alert.show();
+		        	*/
 		        	return true;
 				}
 			}			

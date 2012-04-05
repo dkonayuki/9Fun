@@ -1,10 +1,14 @@
 package net.jstudio.gagCore;
 
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,6 +20,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
@@ -23,8 +28,11 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
@@ -37,13 +45,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-
 public class NineGAG {
 	//Some constants
-	private final String _sMainPage = "http://9gag.com/";
-	private final String _sImg = "http://9gag.com/new/json?list=";
+	private static final String _sMainPage = "http://9gag.com/";
+	private static final String _sImg = "http://9gag.com/new/json?list=";
+	private static final String _sLogin = "https://9gag.com/login";
+	private static final String _sCheckSafeModeIsOff = "safe-mode-toggle off";
 	private static final int _iUpdate = 5;
 	private static final String _sSavedFileName = "saved";
+	private static final String _sPHPSESS_Cookie = "PHPSESSID";
+	private static final String _sSafeModeLink = "http://9gag.com/pref/safe-browse?endable=";
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
 							l_discover 	= new ArrayList<GagEntry>(),
@@ -52,13 +63,35 @@ public class NineGAG {
 	private int point_hot = 0, point_discover = 0, point_trending = 0;
 	private DefaultHttpClient httpclient;
 	private LoadFirstEntriesFinishedListener loadFinished;
-	private ProgressDialog progressDialog;
+	private ProcessLoginFinishedListener lsPLFinished;
+	private ProgressDialog progressDialog, progDlgLogin;
 	private Context _context;
-	
+	private boolean m_isLogged = false, m_bSafeMode = true;
+	private String m_sPHPSESSID;
 	
 	public List<GagEntry> getListHot(){return l_hot;}
 	public List<GagEntry> getListdiscover(){return l_discover;}
 	public List<GagEntry> getListTrending(){return l_trending;}
+	public boolean Logged(){return m_isLogged;}
+	public boolean getSafeMode(){return m_bSafeMode;}
+	
+	public void setSafeMode(boolean mode){
+		try {
+			if(m_isLogged && m_bSafeMode != mode){
+				String value;
+				if(mode)
+					value = "1";
+				else 
+					value = "0";
+				HttpGet get = getHttpGet(_sSafeModeLink + value);
+				httpclient.execute(get);
+				m_bSafeMode = mode;
+			}
+		} catch (ClientProtocolException e) {
+		} catch (IOException e) {
+		}
+	}
+	
 	public List<GagEntry> getList(EntryType type){
 		switch(type){
 			case TRENDING:
@@ -89,15 +122,15 @@ public class NineGAG {
 		HttpGet httpget;
 		switch(type){
 			case TRENDING:
-				httpget = new HttpGet(_sImg + "trending&id=" 
+				httpget = getHttpGet(_sImg + "trending&id=" 
 									+ l_trending.get(l_trending.size() - 1).getID());
 				break;
 			case DISCOVER:
-				httpget = new HttpGet(_sImg + "discover&id=" 
+				httpget = getHttpGet(_sImg + "discover&id=" 
 										+ l_discover.get(l_discover.size() - 1).getID());
 				break;
 			default://HOT	
-				httpget = new HttpGet(_sImg + "hot&id="
+				httpget = getHttpGet(_sImg + "hot&id="
 										+ l_hot.get(l_hot.size() - 1).getID());
 				break;
 		}
@@ -215,13 +248,13 @@ public class NineGAG {
 		HttpGet httpget;		
 		switch (type){				
 			case DISCOVER:
-				httpget = new HttpGet(_sMainPage + "discover/");
+				httpget = getHttpGet(_sMainPage + "discover/");
 				break;
 			case TRENDING:
-				httpget = new HttpGet(_sMainPage + "trending/");
+				httpget = getHttpGet(_sMainPage + "trending/");
 				break;
 			default:
-				httpget = new HttpGet(_sMainPage + "hot/");
+				httpget = getHttpGet(_sMainPage + "hot/");
 				break;
 		}
 		
@@ -360,6 +393,112 @@ public class NineGAG {
 		return true;
 	}
 	
+	public HttpGet getHttpGet(String sLink){
+		HttpGet get = new HttpGet(sLink);
+		if(m_isLogged){
+			//Set cookie
+			int f1 = m_sPHPSESSID.indexOf("=");
+	        int f2 = m_sPHPSESSID.length();
+			Cookie newCookie = new BasicClientCookie(_sPHPSESS_Cookie, m_sPHPSESSID.substring(f1 + 1, f2));
+			CookieStore store = new BasicCookieStore();
+		    store.addCookie(newCookie);
+		    httpclient.setCookieStore(store);
+		    
+			get.setHeader("Cookie", m_sPHPSESSID);
+		}
+		return get;
+	}
+	
+	public void Login(String username, String password, ProcessLoginFinishedListener ls){
+		progDlgLogin = ProgressDialog.show(_context, "", _context.getString(R.string.Logging));
+		lsPLFinished = ls;
+		ProcessLoginTask log = new ProcessLoginTask();
+		log.execute(username, password);
+	}
+	private class ProcessLoginTask extends AsyncTask<String, Void, LoginReturnValue>{
+
+		@Override
+		protected LoginReturnValue doInBackground(String... params) {
+			LoginReturnValue re = new LoginReturnValue();
+			try {
+				//Get csrftoken
+				final String token = "crsftoken";
+				HttpGet get = new HttpGet(_sLogin);
+				String sLoginPage = Utilities.ReadInputHTTP(httpclient.execute(get));
+				int f1 = sLoginPage.indexOf(token);
+				f1 = sLoginPage.indexOf("value=\"", f1);
+				f1 += 7;
+				int f2 = sLoginPage.indexOf("\"", f1);
+				String sToken = sLoginPage.substring(f1, f2);
+				
+				//Login
+				 URL url = new URL(_sLogin);
+				 HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+				 urlc.setRequestMethod("POST");
+				 urlc.setDoOutput(true);
+				 urlc.setDoInput(true);
+				 urlc.setUseCaches(false);
+				 urlc.setAllowUserInteraction(false);
+				 
+				 int i = 0;
+				 while(!httpclient.getCookieStore().getCookies().get(i)
+						 .getName().contains(_sPHPSESS_Cookie))
+					 i++;
+				 Cookie prvCookie = httpclient.getCookieStore().getCookies().get(i);
+				 urlc.setRequestProperty("Cookie", prvCookie.getName() + "=" + prvCookie.getValue());
+				 urlc.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+				 String output = "csrftoken="+ URLEncoder.encode(sToken, HTTP.UTF_8)
+		                +"&username="+ URLEncoder.encode(params[0], HTTP.UTF_8)
+		                +"&password="+ URLEncoder.encode(params[1], HTTP.UTF_8);
+				 DataOutputStream dataout = new DataOutputStream(urlc.getOutputStream());
+				 dataout.writeBytes(output);
+				 
+				if(urlc.getResponseCode() == 302){
+					re.Success = true;
+					String sCookie = urlc.getHeaderField(8);//PHPSESSID in 8th header
+					f1 = sCookie.indexOf("=");
+			        f2 = sCookie.indexOf(";", f1);
+					re.PHPSESSID = _sPHPSESS_Cookie + "=" + sCookie.substring(f1 + 1, f2);
+					//Set cookie
+					Cookie newCookie = new BasicClientCookie(_sPHPSESS_Cookie, sCookie.substring(f1 + 1, f2));
+					CookieStore store = new BasicCookieStore();
+				    store.addCookie(newCookie);
+				    httpclient.setCookieStore(store);
+					//SafeMode is on or off
+					get = new HttpGet(_sMainPage);
+					get.setHeader("Cookie", re.PHPSESSID);
+					String sMainPage = Utilities.ReadInputHTTP(httpclient.execute(get));
+					if(sMainPage.contains(_sCheckSafeModeIsOff))
+						re.SafeMode = false;
+				}
+				else //200
+					re.Success = false;
+			} catch (Exception e) {
+				System.out.println("d");
+			}
+			
+			return re;
+		}
+
+		@Override
+		protected void onPostExecute(LoginReturnValue result) {
+			m_isLogged = result.Success;
+			m_bSafeMode = result.SafeMode;
+			m_sPHPSESSID = result.PHPSESSID;
+			progDlgLogin.dismiss();
+			if(lsPLFinished != null)
+				lsPLFinished.OnProcessLoginFinished(m_isLogged, m_bSafeMode);
+		}
+	}
+	public interface ProcessLoginFinishedListener{
+		public void OnProcessLoginFinished(boolean Success, boolean SafeMode);
+	}
+	private class LoginReturnValue{
+		public LoginReturnValue(){}
+		public boolean Success = false;
+		public boolean SafeMode = true;
+		public String PHPSESSID;
+	}
 	
 	private class LoadFirstEntriesTask extends AsyncTask<EntryType, Void, List<GagEntry>>{
 
