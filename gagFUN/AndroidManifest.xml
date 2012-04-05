@@ -28,6 +28,14 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+         <activity
+            android:name=".LoginActivity"
+            android:label="LoginActivity">
+            <intent-filter >
+                <action android:name="net.jstudio.Login"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
          <activity android:name="com.google.ads.AdActivity"
               android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
               />

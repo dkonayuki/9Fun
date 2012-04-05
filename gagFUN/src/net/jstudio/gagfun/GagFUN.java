@@ -30,6 +30,7 @@ public class GagFUN extends Activity {
 	private NineGAG _nineGag;	
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
+	private int request_Code = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,19 +174,8 @@ public class GagFUN extends Activity {
 					startActivity(new Intent("net.jstudio.Preference"));
 				}return true;
 				case R.id.mnu_login:{
-					_nineGag.Login("khanhnv90", "abcd1234", new NineGAG.ProcessLoginFinishedListener() {
-						
-						public void OnProcessLoginFinished(boolean Success, boolean SafeMode) {
-							AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
-				        	builder.setMessage(String.valueOf(Success)+"--"+String.valueOf(SafeMode))
-				        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
-										public void onClick(DialogInterface dialog, int which) {						
-										}
-									});
-				        	AlertDialog alert = builder.create();
-				        	alert.show();
-						}
-					});
+					startActivityForResult(new Intent("net.jstudio.Login"), request_Code);
+					
 					/*
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		        	builder.setMessage(R.string.NextVersion)
@@ -203,6 +193,26 @@ public class GagFUN extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
     
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == request_Code) {
+			if (resultCode == RESULT_OK) {
+				//Toast.makeText(getBaseContext(), data.getStringExtra("username"), Toast.LENGTH_SHORT).show();
+				_nineGag.Login(data.getStringExtra("username"),data.getStringExtra("password"), new NineGAG.ProcessLoginFinishedListener() {
+					
+					public void OnProcessLoginFinished(boolean Success, boolean SafeMode) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
+			        	builder.setMessage(String.valueOf(Success)+"--"+String.valueOf(SafeMode))
+			        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
+									public void onClick(DialogInterface dialog, int which) {						
+									}
+								});
+			        	AlertDialog alert = builder.create();
+			        	alert.show();
+					}
+				});
+			}
+		}
+	}
 
 	@Override
 	protected void onDestroy() {		

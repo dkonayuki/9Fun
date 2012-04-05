@@ -20,4 +20,7 @@
 	<string name="SupportUs">Thank you for your coming back! Please support us by clicking advertisement!</string>
 	<string name="no_img">You need to refresh 9Fun, or this is the newest gag.</string>
 	<string name="Logging">Logging in &#8230;</string>
+	<string name="gag">9GAG</string>
+	<string name="username">Username</string>
+	<string name="password">Password</string>
 </resources>
