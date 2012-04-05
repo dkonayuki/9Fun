@@ -9,6 +9,7 @@
 	<string name="mnuHot">Hot Page</string>
 	<string name="mnuTrending">Trending Page</string>
 	<string name="mnuLogin">Login</string>
+	<string name="mnuLogout">Logout</string>
 	<string name="stSafemode">Safemode</string>
 	<string name="safeModeTitle">Safe Mode</string>
 	<string name="safeModeSub">Check to turn SafeMode on</string>
@@ -21,6 +22,9 @@
 	<string name="no_img">You need to refresh 9Fun, or this is the newest gag.</string>
 	<string name="Logging">Logging in &#8230;</string>
 	<string name="gag">9GAG</string>
-	<string name="username">Username</string>
-	<string name="password">Password</string>
+	<string name="username">Username or Email:</string>
+	<string name="password">Password:</string>
+	<string name="UsernamePasswordIncorrect">Your entered Username or Password were not corrected. Please enter again!</string>
+	<string name="Logged">You are logged.</string>
+	<string name="Logout">You have logged out</string>
 </resources>

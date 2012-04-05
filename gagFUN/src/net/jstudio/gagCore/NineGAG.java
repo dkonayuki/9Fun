@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.jstudio.gagfun.PublicResource;
 import net.jstudio.gagfun.R;
 
 import org.apache.http.HttpEntity;
@@ -54,7 +55,8 @@ public class NineGAG {
 	private static final int _iUpdate = 5;
 	private static final String _sSavedFileName = "saved";
 	private static final String _sPHPSESS_Cookie = "PHPSESSID";
-	private static final String _sSafeModeLink = "http://9gag.com/pref/safe-browse?endable=";
+	private static final String _sSafeModeLink = "http://9gag.com/pref/safe-browse?enable=";
+	private static final String _sLogout = "http://9gag.com/logout";
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
 							l_discover 	= new ArrayList<GagEntry>(),
@@ -86,12 +88,25 @@ public class NineGAG {
 				HttpGet get = getHttpGet(_sSafeModeLink + value);
 				httpclient.execute(get);
 				m_bSafeMode = mode;
+				PublicResource.setSafeMode(_context, mode);
 			}
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
 	}
 	
+	public void Logout(){
+		try{
+			if(m_isLogged){
+				HttpGet get = getHttpGet(_sLogout);
+				httpclient.execute(get);
+				httpclient.getCookieStore().clear();
+				m_isLogged = false;
+				m_bSafeMode = true;
+				PublicResource.setSafeMode(_context, true);
+			}
+		}catch(Exception e){}
+	}
 	public List<GagEntry> getList(EntryType type){
 		switch(type){
 			case TRENDING:
@@ -484,6 +499,7 @@ public class NineGAG {
 		protected void onPostExecute(LoginReturnValue result) {
 			m_isLogged = result.Success;
 			m_bSafeMode = result.SafeMode;
+			PublicResource.setSafeMode(_context, m_bSafeMode);
 			m_sPHPSESSID = result.PHPSESSID;
 			progDlgLogin.dismiss();
 			if(lsPLFinished != null)

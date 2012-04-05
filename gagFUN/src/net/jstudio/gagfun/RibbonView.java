@@ -44,6 +44,9 @@ public class RibbonView extends ViewAnimator {
 	private LinearLayout menuTop, menuBot;
 	private CommentDialog FBCmtDialog = null;
 	
+	public boolean NeedToRefresh = false;
+	
+	
 	private GagEntry getCurrentEntry(){return _nineGag.getList(m_type).get(getDisplayedChild());}
 	private void addNewView(GagEntry entry, boolean addToQueue){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
@@ -183,6 +186,7 @@ public class RibbonView extends ViewAnimator {
 		hideMenu();
 		removeAllViews();
 		setUpLoadFirstEntry();
+		NeedToRefresh = false;
 	}
 	
 	private void setUpLoadFirstEntry(){

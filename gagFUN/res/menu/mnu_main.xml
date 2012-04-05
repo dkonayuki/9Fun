@@ -15,7 +15,7 @@
      </item>
      <item 	android:id="@+id/mnu_login"
          	android:title="@string/mnuLogin"
-         	android:icon="@drawable/ic_login"
+         	android:icon="@drawable/ic_login9gag"
          	/>
      <item 	android:id="@+id/mnu_setting"
          	android:title="@string/mnuSettings"

@@ -20,9 +20,14 @@ public class PublicResource {
 	private static Movie m_Down = null;
 	private static Bitmap m_NSFW = null;
 	
+	
 	public static Bitmap NSFWBitmap(){return m_NSFW;}
 	public static Movie LoadingMovie(){return m_LoadingMovie;}
 	public static Movie LoadingDown(){return m_Down;}
+	public enum Activity{
+		Login
+	}
+	
 	public static void LoadResource(Context ct){
 		//Load "loading movie"
 		try {
@@ -42,6 +47,7 @@ public class PublicResource {
 	private static final String sCurrent_TRENDING = "CurrentTRENDING";
 	private static final String sCurrent_Page = "CurrentPage";
 	private static final String sTouchMode = "touchMode";
+	private static final String sSafeMode = "safeMode";
 	
 	public static EntryType getPrefCurrentPage(Context ct){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
@@ -89,9 +95,21 @@ public class PublicResource {
 		}		
 		editor.commit();
 	}
-	
+
 	public static boolean getPrefTouchMode(Context ct){
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ct);
 		return pref.getBoolean(sTouchMode, false);
+	}
+	
+	public static boolean getSafeMode(Context ct){
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ct);
+		return pref.getBoolean(sSafeMode, true);
+	}
+	
+	public static void setSafeMode(Context ct, boolean value){
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ct);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putBoolean(sSafeMode, value);
+		editor.commit();
 	}
 }

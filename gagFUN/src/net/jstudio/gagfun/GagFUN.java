@@ -30,7 +30,6 @@ public class GagFUN extends Activity {
 	private NineGAG _nineGag;	
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
-	private int request_Code = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,9 +110,17 @@ public class GagFUN extends Activity {
         btt_next.bringToFront();
         btt_previous.bringToFront();
         setOnClickButton(rbV);
-    	
+    	if(rbV.NeedToRefresh)
+    		rbV.Reset();
     }
     
+    public RibbonView getCurrentRibbon(){
+    	if(layout.indexOfChild(rbV_hot) != -1)
+    		return rbV_hot;
+    	if(layout.indexOfChild(rbV_trending) != -1)
+    		return rbV_trending;
+    	return null;
+    }
     private boolean CheckIfInternetIsAvailable(){
     	ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     	if(cm != null){
@@ -147,7 +154,23 @@ public class GagFUN extends Activity {
 		}
 		return true;
 	}
+	
+	
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		//Change Login Icon
+		MenuItem item = (MenuItem)menu.findItem(R.id.mnu_login);
+		if(_nineGag.Logged()){
+			item.setIcon(R.drawable.ic_logout9gag);
+			item.setTitle(R.string.mnuLogout);
+		}else{
+			item.setIcon(R.drawable.ic_login9gag);
+			item.setTitle(R.string.mnuLogin);
+		}
+			
+		return true;
+	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
@@ -174,18 +197,12 @@ public class GagFUN extends Activity {
 					startActivity(new Intent("net.jstudio.Preference"));
 				}return true;
 				case R.id.mnu_login:{
-					startActivityForResult(new Intent("net.jstudio.Login"), request_Code);
-					
-					/*
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        	builder.setMessage(R.string.NextVersion)
-		        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
-								public void onClick(DialogInterface dialog, int which) {						
-								}
-							});
-		        	AlertDialog alert = builder.create();
-		        	alert.show();
-		        	*/
+					if(_nineGag.Logged()){
+						_nineGag.Logout();
+						Toast t = Toast.makeText(GagFUN.this, R.string.Logout, Toast.LENGTH_SHORT);
+						t.show();
+					}else
+						startActivityForResult(new Intent("net.jstudio.Login"), PublicResource.Activity.Login.ordinal());
 		        	return true;
 				}
 			}			
@@ -194,20 +211,32 @@ public class GagFUN extends Activity {
 	}
     
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == request_Code) {
+		if (requestCode == PublicResource.Activity.Login.ordinal()) {
 			if (resultCode == RESULT_OK) {
 				//Toast.makeText(getBaseContext(), data.getStringExtra("username"), Toast.LENGTH_SHORT).show();
-				_nineGag.Login(data.getStringExtra("username"),data.getStringExtra("password"), new NineGAG.ProcessLoginFinishedListener() {
+				_nineGag.Login(data.getStringExtra(LoginActivity.Result.Username.toString()),
+								data.getStringExtra(LoginActivity.Result.Password.toString()), 
+								new NineGAG.ProcessLoginFinishedListener() {
 					
 					public void OnProcessLoginFinished(boolean Success, boolean SafeMode) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
-			        	builder.setMessage(String.valueOf(Success)+"--"+String.valueOf(SafeMode))
-			        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
-									public void onClick(DialogInterface dialog, int which) {						
-									}
-								});
-			        	AlertDialog alert = builder.create();
-			        	alert.show();
+						if(Success){
+							setAllRibbonNeedToRefresh();
+							GagFUN.this.getCurrentRibbon().Reset();
+							Toast t = Toast.makeText(GagFUN.this, R.string.Logged, Toast.LENGTH_SHORT);
+							t.show();
+						}else{
+							AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
+							builder.setMessage(R.string.UsernamePasswordIncorrect)
+									.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+										
+										public void onClick(DialogInterface dialog, int which) {
+											GagFUN.this.startActivityForResult(new Intent("net.jstudio.Login"), 
+													PublicResource.Activity.Login.ordinal());
+										}
+									});
+							AlertDialog alert = builder.create();
+							alert.show();
+						}
 					}
 				});
 			}
@@ -244,9 +273,8 @@ public class GagFUN extends Activity {
         	AlertDialog alert = builder.create();
         	alert.show();
         }
-		super.onResume();
+		
 		//Fix android bugs
-		setUpOnScreenButtonMode();
 		Handler hl = new Handler();
 		hl.postDelayed(new Runnable(){
 
@@ -256,9 +284,21 @@ public class GagFUN extends Activity {
 			
 		}, 500);
 		
+		setUpOnScreenButtonMode();
+		setUpSafemode();
 		
+		super.onResume();
 	}
     
+	private void setUpSafemode() {
+		boolean mode = PublicResource.getSafeMode(this);
+		if(mode != _nineGag.getSafeMode()){
+			_nineGag.setSafeMode(mode);
+			setAllRibbonNeedToRefresh();
+			getCurrentRibbon().Reset();
+		}
+	}
+	
 	private void setUpOnScreenButtonMode(){
 		if(btt_previous != null && btt_next != null){
 			if(PublicResource.getPrefTouchMode(this)){
@@ -271,5 +311,12 @@ public class GagFUN extends Activity {
 				btt_previous.setVisibility(View.INVISIBLE);
 			}
 		}
+	}
+	
+	private void setAllRibbonNeedToRefresh(){
+		if(rbV_hot != null)
+			rbV_hot.NeedToRefresh = true;
+		if(rbV_trending != null)
+			rbV_trending.NeedToRefresh = true;
 	}
 }
