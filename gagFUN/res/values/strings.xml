@@ -25,7 +25,7 @@
 	<string name="gag">9GAG</string>
 	<string name="username">Username or Email:</string>
 	<string name="password">Password:</string>
-	<string name="UsernamePasswordIncorrect">Your entered Username or Password were not corrected. Please enter again!</string>
+	<string name="UsernamePasswordIncorrect">Your Username or Password are not correct. Please try again!</string>
 	<string name="Logged">You are logged.</string>
 	<string name="Logout">You have logged out</string>
 	<string name="LoginToUseVotePage">You can not browse Vote Page without logging in. Please log in!</string>

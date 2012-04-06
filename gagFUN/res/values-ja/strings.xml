@@ -19,4 +19,15 @@
 	<string name="NextVersion">私たちはこの機能を開発中なので、そこまでお待ちください。</string>
 	<string name="SupportUs">Thank you for your coming back! Please support us by clicking advertisement!</string>
 	<string name="no_img">リフレッシュする必要があります。あるいは最新の映像につきました。</string>
+	<string name="Logging">ロッギング中 &#8230;</string>
+	<string name="gag">9GAG</string>
+	<string name="username">ユーザー名またはメールアド：</string>
+	<string name="password">パスワード：</string>
+	<string name="UsernamePasswordIncorrect">ユーザー名またはパスワードは正しくありません!</string>
+	<string name="Logged">ログインしました</string>
+	<string name="Logout">ログアウトしました</string>
+	<string name="LoginToUseVotePage">ログインしなければ、投票ページが表示できません。ログインしてください</string>
+	<string name="ReturnToHotPage">ログインしなければ、投票ページが表示できません。ホットページに自動的に戻ります</string>
+	<string name="OnlySafeModeOn">ログインしないため、セーフモードしか利用できません。</string>
+	<string name="ShareWith">シェア</string>
 </resources>
