@@ -45,11 +45,12 @@ public class PublicResource {
 	private static final String sPrefName = "PrefName";
 	private static final String sCurrent_HOT = "CurrentHOT";
 	private static final String sCurrent_TRENDING = "CurrentTRENDING";
+	private static final String sCurrent_VOTE = "CurrentVOTE";
 	private static final String sCurrent_Page = "CurrentPage";
 	private static final String sPHPSESSID = "PHPSESSID";
 	private static final String sLogged = "Logged";
 	private static final String sTouchMode = "touchMode";
-	private static final String sSafeMode = "safeMode";
+	public static final String sSafeMode = "safeMode";
 	
 	public static EntryType getPrefCurrentPage(Context ct){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
@@ -57,6 +58,8 @@ public class PublicResource {
 		switch (i){			
 			case 1:
 				return EntryType.TRENDING;
+			case 2:
+				return EntryType.VOTE;
 		}
 		return EntryType.HOT;
 	}
@@ -70,6 +73,8 @@ public class PublicResource {
 			case TRENDING:
 				editor.putInt(sCurrent_Page, 1);
 				break;
+			case VOTE:
+				editor.putInt(sCurrent_Page, 2);
 		}
 		editor.commit();
 	}
@@ -80,6 +85,8 @@ public class PublicResource {
 				return pref.getInt(sCurrent_HOT, -1);
 			case TRENDING:
 				return pref.getInt(sCurrent_TRENDING, -1);
+			case VOTE:
+				return pref.getInt(sCurrent_VOTE, -1);
 		}
 		return -1;
 	}
@@ -116,6 +123,9 @@ public class PublicResource {
 				break;
 			case TRENDING:
 				editor.putInt(sCurrent_TRENDING, value);
+				break;
+			case VOTE:
+				editor.putInt(sCurrent_VOTE, value);
 				break;
 		}		
 		editor.commit();

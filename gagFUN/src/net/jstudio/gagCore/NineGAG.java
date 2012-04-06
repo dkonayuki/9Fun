@@ -57,12 +57,14 @@ public class NineGAG {
 	private static final String _sPHPSESS_Cookie = "PHPSESSID";
 	private static final String _sSafeModeLink = "http://9gag.com/pref/safe-browse?enable=";
 	private static final String _sLogout = "http://9gag.com/logout";
+	public static final String love_count_dot = "bull";
 	
 	private List<GagEntry> 	l_hot 		= new ArrayList<GagEntry>(),
 							l_discover 	= new ArrayList<GagEntry>(),
-							l_trending 	= new ArrayList<GagEntry>();
+							l_trending 	= new ArrayList<GagEntry>(),
+							l_vote 		= new ArrayList<GagEntry>();
 							
-	private int point_hot = 0, point_discover = 0, point_trending = 0;
+	private int point_hot = 0, point_discover = 0, point_trending = 0, point_vote = 0;
 	private DefaultHttpClient httpclient;
 	private LoadFirstEntriesFinishedListener loadFinished;
 	private ProcessLoginFinishedListener lsPLFinished;
@@ -74,6 +76,8 @@ public class NineGAG {
 	public List<GagEntry> getListHot(){return l_hot;}
 	public List<GagEntry> getListdiscover(){return l_discover;}
 	public List<GagEntry> getListTrending(){return l_trending;}
+	public List<GagEntry> getListVote(){return l_vote;}
+	
 	public boolean Logged(){return m_isLogged;}
 	public boolean getSafeMode(){return m_bSafeMode;}
 	public String getPHPSESSID(){return m_sPHPSESSID;}
@@ -117,6 +121,8 @@ public class NineGAG {
 				return l_trending;
 			case DISCOVER:					
 				return l_discover;
+			case VOTE:
+				return l_vote;
 		}
 		//by default
 		return l_hot;
@@ -133,6 +139,10 @@ public class NineGAG {
 				point_trending = 0;
 				l_trending.clear();				
 				break;
+			case VOTE:
+				point_vote = 0;
+				l_vote.clear();
+				break;
 		}
 	}
 	
@@ -147,6 +157,10 @@ public class NineGAG {
 			case DISCOVER:
 				httpget = getHttpGet(_sImg + "discover&id=" 
 										+ l_discover.get(l_discover.size() - 1).getID());
+				break;
+			case VOTE:
+				httpget = getHttpGet(_sImg + "vote&id=" 
+						+ l_vote.get(l_vote.size() - 1).getID());
 				break;
 			default://HOT	
 				httpget = getHttpGet(_sImg + "hot&id="
@@ -179,7 +193,9 @@ public class NineGAG {
 				else if(type == EntryType.TRENDING){
 					l_trending.addAll(produceEntriesFromString(strb.toString(), type));
 				}
-				else{
+				else if(type == EntryType.VOTE){
+					l_vote.addAll(produceEntriesFromString(strb.toString(), type));
+				}else{
 					l_hot.addAll(produceEntriesFromString(strb.toString(), type));
 				}
 				
@@ -207,11 +223,19 @@ public class NineGAG {
 				updateNewEntries(type);
 			} catch (Exception e) {}
 		
+		if((l_vote.size() != 0 && ((l_vote.size() - point_vote) <= _iUpdate)))
+			try {
+				updateNewEntries(type);
+			} catch (Exception e) {}
+		
 		if(type == EntryType.TRENDING)			
 			return l_trending.get(point_trending++);
 		
 		if(type == EntryType.DISCOVER)			
 			return l_discover.get(point_discover++);
+		
+		if(type == EntryType.VOTE)			
+			return l_vote.get(point_vote++);
 		
 		//for Default(hot)
 		return l_hot.get(point_hot++);
@@ -219,6 +243,7 @@ public class NineGAG {
 	public int getPointHot(){return point_hot;}
 	public int getPointDiscover(){return point_discover;}
 	public int getPointTrending(){return point_trending;}
+	public int getPointVote(){return point_vote;}
 	
 	private List<GagEntry> produceEntriesFromString(String str, EntryType type){
 		Pattern par_gagid = Pattern.compile("gagid=\"[0-9]*\"", Pattern.CASE_INSENSITIVE);
@@ -258,7 +283,8 @@ public class NineGAG {
 			f1 = str.indexOf(">", f1);
 			f2 = str.indexOf("<", f1);
 			String loveCount = str.substring(f1 + 1, f2);
-			
+			if(loveCount.contains(love_count_dot))
+				loveCount = "0";
 			list_entry.add(new GagEntry(httpclient, id, name, url, link, loveCount, type));
 		}
 		return list_entry;
@@ -271,6 +297,9 @@ public class NineGAG {
 				break;
 			case TRENDING:
 				httpget = getHttpGet(_sMainPage + "trending/");
+				break;
+			case VOTE:
+				httpget = getHttpGet(_sMainPage + "vote/");
 				break;
 			default:
 				httpget = getHttpGet(_sMainPage + "hot/");
@@ -325,12 +354,15 @@ public class NineGAG {
 		JSONArray array = new JSONArray();
 		List<GagEntry> list = null;
 		switch(type){
-		case HOT:
-			list = l_hot;
-			break;
-		case TRENDING:
-			list = l_trending;
-			break;
+			case HOT:
+				list = l_hot;
+				break;
+			case TRENDING:
+				list = l_trending;
+				break;
+			case VOTE:
+				list = l_vote;
+				break;
 		}
 		for(GagEntry entry : list){
 			JSONObject js_item = new JSONObject();
@@ -353,6 +385,7 @@ public class NineGAG {
 			try {
 				json.put(EntryType.HOT.toString(), getJSONString(EntryType.HOT));
 				json.put(EntryType.TRENDING.toString(), getJSONString(EntryType.TRENDING));
+				json.put(EntryType.VOTE.toString(), getJSONString(EntryType.VOTE));
 			} catch (JSONException e) {
 			}
 			fos.write(json.toString().getBytes());
@@ -400,7 +433,19 @@ public class NineGAG {
 							js_item.getString(DataEntry.LOVECOUNT.toString()),
 							EntryType.TRENDING
 							));
-
+				}
+				//VOTE
+				arr = new JSONArray(json.getString(EntryType.VOTE.toString()).toString());
+				for(int i = 0; i < arr.length() - 1; i++){
+					JSONObject js_item = new JSONObject(arr.getString(i));
+					l_vote.add(new GagEntry(httpclient,
+							js_item.getInt(DataEntry.ID.toString()),
+							js_item.getString(DataEntry.NAME.toString()),
+							js_item.getString(DataEntry.URL.toString()),
+							js_item.getString(DataEntry.IMGLINK.toString()),
+							js_item.getString(DataEntry.LOVECOUNT.toString()),
+							EntryType.VOTE
+							));
 				}
 			} catch (JSONException e) {				
 			}
@@ -538,6 +583,8 @@ public class NineGAG {
 				l_discover.addAll(result);
 			else if (type == EntryType.TRENDING)
 				l_trending.addAll(result);
+			else if (type == EntryType.VOTE)
+				l_vote.addAll(result);
 			else
 				l_hot.addAll(result);
 			if(loadFinished != null)

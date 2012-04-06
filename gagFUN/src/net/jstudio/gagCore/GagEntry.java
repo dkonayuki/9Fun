@@ -36,6 +36,7 @@ public class GagEntry {
 	private static final String likeapi_begin = "http://api.facebook.com/method/fql.query?query=select%20total_count%20from%20link_stat%20where%20url=%279";
 	private static final String likeapi_end = "%27&format=json";
 	private static final String fbcommentapi = "http://www.facebook.com/plugins/comments.php?href=";
+	
 	//
 	public GagEntry(HttpClient client,
 			int id, 
@@ -130,6 +131,8 @@ public class GagEntry {
 					f1 += strFind.length();
 					f1 = str.indexOf(">", f1);
 					int f2 = str.indexOf("<", f1);
+					if(str.substring(f1 + 1, f2).contains(NineGAG.love_count_dot))
+						return 0;
 					return Integer.parseInt(str.substring(f1 + 1, f2));
 				}
 			}catch(Exception e){

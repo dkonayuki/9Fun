@@ -26,7 +26,9 @@ import android.widget.Toast;
 public class GagFUN extends Activity {
     /** Called when the activity is first created. */
 	private RibbonView rbV_hot = null,
-						rbV_trending = null;
+						rbV_trending = null,
+						rbV_vote = null;
+	
 	private NineGAG _nineGag;	
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
@@ -58,6 +60,7 @@ public class GagFUN extends Activity {
         if(!_nineGag.LoadDataFromFile()){//IF fail to load data, reset all variable to 0
         	PublicResource.setPrefCurrentView(this, EntryType.HOT, 0);
         	PublicResource.setPrefCurrentView(this, EntryType.TRENDING, 0);
+        	PublicResource.setPrefCurrentView(this, EntryType.VOTE, 0);
         }
         switch(PublicResource.getPrefCurrentPage(this)){
         	case HOT:        		
@@ -67,6 +70,10 @@ public class GagFUN extends Activity {
         	case TRENDING:        		
         		rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);        		
         		setView(rbV_trending);
+        		break;
+        	case VOTE:        		
+        		rbV_vote = new RibbonView(this, EntryType.VOTE, _nineGag);        		
+        		setView(rbV_vote);
         		break;
         }    
         //Load previous Logged information
@@ -121,6 +128,8 @@ public class GagFUN extends Activity {
     		return rbV_hot;
     	if(layout.indexOfChild(rbV_trending) != -1)
     		return rbV_trending;
+    	if(layout.indexOfChild(rbV_vote) != -1)
+    		return rbV_vote;
     	return null;
     }
     private boolean CheckIfInternetIsAvailable(){
@@ -142,6 +151,13 @@ public class GagFUN extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mnu_main, menu);
+		return true;
+	}
+	
+	
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		//Check menu
 		MenuItem item;
 		switch(PublicResource.getPrefCurrentPage(this)){
@@ -153,16 +169,14 @@ public class GagFUN extends Activity {
 				item = (MenuItem)menu.findItem(R.id.mnu_trending);
 				item.setChecked(true);
 				break;
+			case VOTE:
+				item = (MenuItem)menu.findItem(R.id.mnu_vote);
+				item.setChecked(true);
+				break;
 		}
-		return true;
-	}
-	
-	
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+		
 		//Change Login Icon
-		MenuItem item = (MenuItem)menu.findItem(R.id.mnu_login);
+		item = (MenuItem)menu.findItem(R.id.mnu_login);
 		if(_nineGag.Logged()){
 			item.setIcon(R.drawable.ic_logout9gag);
 			item.setTitle(R.string.mnuLogout);
@@ -170,7 +184,9 @@ public class GagFUN extends Activity {
 			item.setIcon(R.drawable.ic_login9gag);
 			item.setTitle(R.string.mnuLogin);
 		}
-			
+		//Set Vote Menu
+		//item = (MenuItem)menu.findItem(R.id.mnu_vote);
+		//item.setEnabled(_nineGag.Logged());
 		return true;
 	}
 	@Override
@@ -180,29 +196,51 @@ public class GagFUN extends Activity {
 				case R.id.mnu_hot:
 					if(!item.isChecked()){
 						item.setChecked(true);
-							if(rbV_hot == null)
-						rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);					
-					PublicResource.setPrefCurrentPage(this, EntryType.HOT);
-					setView(rbV_hot);
-					
-				}return true;
+						if(rbV_hot == null)
+							rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);					
+						PublicResource.setPrefCurrentPage(this, EntryType.HOT);
+						setView(rbV_hot);
+					}
+					return true;
 				case R.id.mnu_trending:
 					if(!item.isChecked()){
 						item.setChecked(true);
-					if(rbV_trending == null)
-						rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);
+						if(rbV_trending == null)
+							rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);
 						PublicResource.setPrefCurrentPage(this, EntryType.TRENDING);
-					setView(rbV_trending);
-					
-				}return true;
+						setView(rbV_trending);
+					}
+					return true;
+				case R.id.mnu_vote:
+					if(_nineGag.Logged()){
+						if(!item.isChecked()){
+							item.setChecked(true);
+							if(rbV_vote == null)
+								rbV_vote = new RibbonView(this, EntryType.VOTE, _nineGag);
+							PublicResource.setPrefCurrentPage(this, EntryType.VOTE);
+							setView(rbV_vote);
+						}
+					}else{
+						Toast t = Toast.makeText(GagFUN.this, R.string.LoginToUseVotePage, Toast.LENGTH_SHORT);
+						t.show();
+					}
+				return true;
 				case R.id.mnu_setting:{
 					startActivity(new Intent("net.jstudio.Preference"));
 				}return true;
 				case R.id.mnu_login:{
 					if(_nineGag.Logged()){
 						_nineGag.Logout();
+						PublicResource.setLogged(GagFUN.this, false);
 						Toast t = Toast.makeText(GagFUN.this, R.string.Logout, Toast.LENGTH_SHORT);
 						t.show();
+						if(getCurrentRibbon() == rbV_vote){
+							PublicResource.setPrefCurrentPage(this, EntryType.HOT);
+							if(rbV_hot == null)
+								rbV_hot = new RibbonView(this, EntryType.HOT, _nineGag);	
+							setView(rbV_hot);
+							Toast.makeText(GagFUN.this, R.string.ReturnToHotPage, Toast.LENGTH_SHORT).show();
+						}
 					}else
 						startActivityForResult(new Intent("net.jstudio.Login"), PublicResource.Activity.Login.ordinal());
 		        	return true;
@@ -226,6 +264,7 @@ public class GagFUN extends Activity {
 							GagFUN.this.getCurrentRibbon().Reset();
 							Toast t = Toast.makeText(GagFUN.this, R.string.Logged, Toast.LENGTH_SHORT);
 							t.show();
+							PublicResource.setLogged(GagFUN.this, true);
 						}else{
 							AlertDialog.Builder builder = new AlertDialog.Builder(GagFUN.this);
 							builder.setMessage(R.string.UsernamePasswordIncorrect)
@@ -257,6 +296,10 @@ public class GagFUN extends Activity {
 		if(rbV_trending != null){
 			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
 			rbV_trending.DisposeAllDialog();
+		}
+		if(rbV_vote != null){
+			PublicResource.setPrefCurrentView(this, EntryType.VOTE, rbV_vote.getDisplayedChild());
+			rbV_vote.DisposeAllDialog();
 		}
 		//Save Logged information
 		PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
@@ -296,11 +339,13 @@ public class GagFUN extends Activity {
 	}
     
 	private void setUpSafemode() {
-		boolean mode = PublicResource.getSafeMode(this);
-		if(mode != _nineGag.getSafeMode()){
-			_nineGag.postSafeMode(mode);
-			setAllRibbonNeedToRefresh();
-			getCurrentRibbon().Reset();
+		if(_nineGag.Logged()){
+			boolean mode = PublicResource.getSafeMode(this);
+			if(mode != _nineGag.getSafeMode()){
+				_nineGag.postSafeMode(mode);
+				setAllRibbonNeedToRefresh();
+				getCurrentRibbon().Reset();
+			}
 		}
 	}
 	
@@ -323,5 +368,7 @@ public class GagFUN extends Activity {
 			rbV_hot.NeedToRefresh = true;
 		if(rbV_trending != null)
 			rbV_trending.NeedToRefresh = true;
+		if(rbV_vote != null)
+			rbV_vote.NeedToRefresh = true;
 	}
 }

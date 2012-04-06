@@ -8,6 +8,7 @@
 	<string name="mnuSettings">Preference</string>
 	<string name="mnuHot">Hot Page</string>
 	<string name="mnuTrending">Trending Page</string>
+	<string name="mnuVote">Vote Page</string>
 	<string name="mnuLogin">Login</string>
 	<string name="mnuLogout">Logout</string>
 	<string name="stSafemode">Safemode</string>
@@ -27,4 +28,7 @@
 	<string name="UsernamePasswordIncorrect">Your entered Username or Password were not corrected. Please enter again!</string>
 	<string name="Logged">You are logged.</string>
 	<string name="Logout">You have logged out</string>
+	<string name="LoginToUseVotePage">You can not browse Vote Page without logging in. Please log in!</string>
+	<string name="ReturnToHotPage">You can not browse Vote Page without logging in. You are returned to Hot Page!</string>
+	<string name="OnlySafeModeOn">Because you did not login, you could only browse 9gag in Safe-mode.</string>
 </resources>

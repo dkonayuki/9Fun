@@ -10,6 +10,9 @@
 	        	        	android:checked="true"/>
 	        	    <item	android:id="@+id/mnu_trending"
 	        	        	android:title="@string/mnuTrending" />
+	        	    <item 	android:id="@+id/mnu_vote"
+	        	        	android:title="@string/mnuVote"
+	        	        	/>
 	        	</group>
         	</menu>
      </item>

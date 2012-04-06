@@ -137,9 +137,10 @@ public class EntryImgView extends View {
 
 		public boolean onDoubleTap(MotionEvent e) {
 			if(_gagEntry.isDownloaded()){
-				if(r_img.getScaled() != 1.f)
-					r_img.Reset();				
-				else
+				if(r_img.getScaled() != 1.f){
+					r_img.Reset();
+					//r_img.Scale((int)e.getX(), (int)e.getY(), 0.5f);
+				}else
 					r_img.Scale((int)e.getX(), (int)e.getY(), 2.f);
 				invalidate();
 			}
