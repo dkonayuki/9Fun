@@ -8,6 +8,7 @@ import net.jstudio.gagCore.EntryType;
 import net.jstudio.gagCore.GagEntry;
 import net.jstudio.gagCore.NineGAG;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
@@ -121,13 +122,12 @@ public class RibbonView extends ViewAnimator {
         btt_Share.setBackgroundColor(Color.TRANSPARENT);
         btt_Share.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
-				FBCmtDialog = new CommentDialog(getContext(), 
-						getCurrentEntry().getFBCommentLink());
-		    	int[] pos = {0, 0};
-		    	v.getLocationOnScreen(pos);
-		    	FBCmtDialog.setPosition(pos[0] + v.getWidth()/2, pos[1] + v.getHeight()/2);
-		    	FBCmtDialog.show();
-				
+				Intent share = new Intent(Intent.ACTION_SEND);
+				share.setType("text/plain");
+				GagEntry entry = getCurrentEntry();
+				share.putExtra(Intent.EXTRA_SUBJECT, entry.getEntryName());
+				share.putExtra(Intent.EXTRA_TEXT, entry.getEntryUrl());
+				getContext().startActivity(Intent.createChooser(share, getContext().getString(R.string.ShareWith)));
 			}        	
         });
         //Comment Button

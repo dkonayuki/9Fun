@@ -31,4 +31,5 @@
 	<string name="LoginToUseVotePage">You can not browse Vote Page without logging in. Please log in!</string>
 	<string name="ReturnToHotPage">You can not browse Vote Page without logging in. You are returned to Hot Page!</string>
 	<string name="OnlySafeModeOn">Because you did not login, you could only browse 9gag in Safe-mode.</string>
+	<string name="ShareWith">Share with</string>
 </resources>
