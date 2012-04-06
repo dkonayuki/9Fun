@@ -30,4 +30,7 @@
 	<string name="ReturnToHotPage">ログインしなければ、投票ページが表示できません。ホットページに自動的に戻ります</string>
 	<string name="OnlySafeModeOn">ログインしないため、セーフモードしか利用できません。</string>
 	<string name="ShareWith">シェア</string>
+	<string name="mnuVote">投票ページ</string>
+	<string name="mnuLogout">ログアウト</string>
+	<string name="DidNotExitRightWay">You did not exit application approriate way. Please restart it!</string>
 </resources>

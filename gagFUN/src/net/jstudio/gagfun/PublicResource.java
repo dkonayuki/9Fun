@@ -24,6 +24,8 @@ public class PublicResource {
 	public static Bitmap NSFWBitmap(){return m_NSFW;}
 	public static Movie LoadingMovie(){return m_LoadingMovie;}
 	public static Movie LoadingDown(){return m_Down;}
+	public static boolean WrongExit = false;
+	
 	public enum Activity{
 		Login
 	}
@@ -146,5 +148,16 @@ public class PublicResource {
 		SharedPreferences.Editor editor = pref.edit();
 		editor.putBoolean(sSafeMode, value);
 		editor.commit();
+	}
+	
+	public static void ResetAllVariable(Context ct){
+		setLogged(ct, false);
+		setSafeMode(ct, true);
+		setPrefCurrentPage(ct, EntryType.HOT);
+		setPrefCurrentView(ct, EntryType.HOT, 0);
+		setPrefCurrentView(ct, EntryType.DISCOVER, 0);
+		setPrefCurrentView(ct, EntryType.TRENDING, 0);
+		setPrefCurrentView(ct, EntryType.VOTE, 0);
+		setPHPSESSID(ct, "");
 	}
 }

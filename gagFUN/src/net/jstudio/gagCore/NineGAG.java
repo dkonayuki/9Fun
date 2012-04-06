@@ -42,8 +42,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 
 public class NineGAG {
@@ -577,21 +580,36 @@ public class NineGAG {
 		}
 
 		@Override
-		protected void onPostExecute(List<GagEntry> result) {			
-			EntryType type = result.get(0).getEntryType();
-			if(type == EntryType.DISCOVER)
-				l_discover.addAll(result);
-			else if (type == EntryType.TRENDING)
-				l_trending.addAll(result);
-			else if (type == EntryType.VOTE)
-				l_vote.addAll(result);
-			else
-				l_hot.addAll(result);
-			if(loadFinished != null)
-				loadFinished.OnLoadFirstEntriesFinished();
-			
-			//Close Progress Dialog
-			progressDialog.dismiss();
+		protected void onPostExecute(List<GagEntry> result) {
+			if(result.size() != 0){
+				EntryType type = result.get(0).getEntryType();
+				if(type == EntryType.DISCOVER)
+					l_discover.addAll(result);
+				else if (type == EntryType.TRENDING)
+					l_trending.addAll(result);
+				else if (type == EntryType.VOTE)
+					l_vote.addAll(result);
+				else
+					l_hot.addAll(result);
+				if(loadFinished != null)
+					loadFinished.OnLoadFirstEntriesFinished();
+				
+				//Close Progress Dialog
+				progressDialog.dismiss();
+			}else{
+				PublicResource.WrongExit = true;
+				PublicResource.ResetAllVariable(_context);
+				_context.deleteFile(_sSavedFileName);
+				AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+	        	builder.setMessage(R.string.DidNotExitRightWay)
+	        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
+							public void onClick(DialogInterface dialog, int which) {
+								((Activity)_context).finish();		
+							}
+						});
+	        	AlertDialog alert = builder.create();
+	        	alert.show();
+			}
 		}	
 		
 		

@@ -287,23 +287,25 @@ public class GagFUN extends Activity {
 	@Override
 	protected void onDestroy() {		
 		super.onDestroy();
-		if(_nineGag != null)
-			_nineGag.SaveDataToStorage();
-		if(rbV_hot != null){
-			PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
-			rbV_hot.DisposeAllDialog();
+		if(!PublicResource.WrongExit){
+			if(_nineGag != null)
+				_nineGag.SaveDataToStorage();
+			if(rbV_hot != null){
+				PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
+				rbV_hot.DisposeAllDialog();
+			}
+			if(rbV_trending != null){
+				PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
+				rbV_trending.DisposeAllDialog();
+			}
+			if(rbV_vote != null){
+				PublicResource.setPrefCurrentView(this, EntryType.VOTE, rbV_vote.getDisplayedChild());
+				rbV_vote.DisposeAllDialog();
+			}
+			//Save Logged information
+			PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
+			PublicResource.setLogged(this, _nineGag.Logged());
 		}
-		if(rbV_trending != null){
-			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
-			rbV_trending.DisposeAllDialog();
-		}
-		if(rbV_vote != null){
-			PublicResource.setPrefCurrentView(this, EntryType.VOTE, rbV_vote.getDisplayedChild());
-			rbV_vote.DisposeAllDialog();
-		}
-		//Save Logged information
-		PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
-		PublicResource.setLogged(this, _nineGag.Logged());
 	}
 
 
