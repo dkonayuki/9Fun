@@ -159,13 +159,15 @@ public class RibbonView extends ViewAnimator {
 	public void hideMenu(){
 		menu_on=false;				
 		ViewGroup currentMenu = ((ViewGroup) this.getCurrentView());
-		if(currentMenu.indexOfChild(menuTop) != -1){
-			menuTop.startAnimation(anim_OutToTop);
-			((ViewGroup) this.getCurrentView()).removeView(menuTop);
-		}
-		if(currentMenu.indexOfChild(menuBot) != -1){
-			menuBot.startAnimation(anim_OutToBot);
-			((ViewGroup) this.getCurrentView()).removeView(menuBot);
+		if(currentMenu != null){
+			if(currentMenu.indexOfChild(menuTop) != -1){
+				menuTop.startAnimation(anim_OutToTop);
+				((ViewGroup) this.getCurrentView()).removeView(menuTop);
+			}
+			if(currentMenu.indexOfChild(menuBot) != -1){
+				menuBot.startAnimation(anim_OutToBot);
+				((ViewGroup) this.getCurrentView()).removeView(menuBot);
+			}
 		}
 	}
 	

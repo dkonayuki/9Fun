@@ -76,8 +76,12 @@ public class NineGAG {
 	public List<GagEntry> getListTrending(){return l_trending;}
 	public boolean Logged(){return m_isLogged;}
 	public boolean getSafeMode(){return m_bSafeMode;}
+	public String getPHPSESSID(){return m_sPHPSESSID;}
+	public void setPHPSESSID(String str){m_sPHPSESSID = str;}
+	public void setLogged(boolean logged){m_isLogged = logged;}
+	public void setSafemode(boolean mode){m_bSafeMode = mode;}
 	
-	public void setSafeMode(boolean mode){
+	public void postSafeMode(boolean mode){
 		try {
 			if(m_isLogged && m_bSafeMode != mode){
 				String value;
@@ -310,7 +314,7 @@ public class NineGAG {
 		lfeT_hot.execute(type);
 	}
 	
-	private enum DataToFile{
+	private enum DataEntry{
 		ID,
 		NAME,
 		URL,
@@ -331,11 +335,11 @@ public class NineGAG {
 		for(GagEntry entry : list){
 			JSONObject js_item = new JSONObject();
 			try {
-				js_item.put(DataToFile.ID.toString(), entry.getID());
-				js_item.put(DataToFile.NAME.toString(), entry.getEntryName());
-				js_item.put(DataToFile.URL.toString(), entry.getEntryUrl());
-				js_item.put(DataToFile.IMGLINK.toString(), entry.getLink());
-				js_item.put(DataToFile.LOVECOUNT.toString(), entry.getLoveCount());
+				js_item.put(DataEntry.ID.toString(), entry.getID());
+				js_item.put(DataEntry.NAME.toString(), entry.getEntryName());
+				js_item.put(DataEntry.URL.toString(), entry.getEntryUrl());
+				js_item.put(DataEntry.IMGLINK.toString(), entry.getLink());
+				js_item.put(DataEntry.LOVECOUNT.toString(), entry.getLoveCount());
 				array.put(js_item.toString());
 			} catch (JSONException e) {				
 			}				
@@ -376,11 +380,11 @@ public class NineGAG {
 				for(int i = 0; i < arr.length() - 1; i++){
 					JSONObject js_item = new JSONObject(arr.getString(i));
 					l_hot.add(new GagEntry(httpclient,
-							js_item.getInt(DataToFile.ID.toString()),
-							js_item.getString(DataToFile.NAME.toString()),
-							js_item.getString(DataToFile.URL.toString()),
-							js_item.getString(DataToFile.IMGLINK.toString()),
-							js_item.getString(DataToFile.LOVECOUNT.toString()),
+							js_item.getInt(DataEntry.ID.toString()),
+							js_item.getString(DataEntry.NAME.toString()),
+							js_item.getString(DataEntry.URL.toString()),
+							js_item.getString(DataEntry.IMGLINK.toString()),
+							js_item.getString(DataEntry.LOVECOUNT.toString()),
 							EntryType.HOT
 							));
 				}
@@ -389,11 +393,11 @@ public class NineGAG {
 				for(int i = 0; i < arr.length() - 1; i++){
 					JSONObject js_item = new JSONObject(arr.getString(i));
 					l_trending.add(new GagEntry(httpclient,
-							js_item.getInt(DataToFile.ID.toString()),
-							js_item.getString(DataToFile.NAME.toString()),
-							js_item.getString(DataToFile.URL.toString()),
-							js_item.getString(DataToFile.IMGLINK.toString()),
-							js_item.getString(DataToFile.LOVECOUNT.toString()),
+							js_item.getInt(DataEntry.ID.toString()),
+							js_item.getString(DataEntry.NAME.toString()),
+							js_item.getString(DataEntry.URL.toString()),
+							js_item.getString(DataEntry.IMGLINK.toString()),
+							js_item.getString(DataEntry.LOVECOUNT.toString()),
 							EntryType.TRENDING
 							));
 

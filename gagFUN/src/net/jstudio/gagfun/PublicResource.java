@@ -46,6 +46,8 @@ public class PublicResource {
 	private static final String sCurrent_HOT = "CurrentHOT";
 	private static final String sCurrent_TRENDING = "CurrentTRENDING";
 	private static final String sCurrent_Page = "CurrentPage";
+	private static final String sPHPSESSID = "PHPSESSID";
+	private static final String sLogged = "Logged";
 	private static final String sTouchMode = "touchMode";
 	private static final String sSafeMode = "safeMode";
 	
@@ -82,6 +84,29 @@ public class PublicResource {
 		return -1;
 	}
 	
+	public static String getPHPSESSID(Context ct){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		return pref.getString(sPHPSESSID, "");
+	}
+	
+	public static boolean getLogged(Context ct){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		return pref.getBoolean(sLogged, false);
+	}
+	
+	public static void setPHPSESSID(Context ct, String str){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putString(sPHPSESSID, str);
+		editor.commit();
+	}
+	
+	public static void setLogged(Context ct, boolean value){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putBoolean(sLogged, value);
+		editor.commit();
+	}
 	public static void setPrefCurrentView(Context ct, EntryType type, int value){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = pref.edit();

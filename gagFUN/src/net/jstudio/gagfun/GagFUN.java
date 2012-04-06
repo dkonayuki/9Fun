@@ -68,9 +68,11 @@ public class GagFUN extends Activity {
         		rbV_trending = new RibbonView(this, EntryType.TRENDING, _nineGag);        		
         		setView(rbV_trending);
         		break;
-        		
         }    
-	 
+        //Load previous Logged information
+        _nineGag.setPHPSESSID(PublicResource.getPHPSESSID(this));
+        _nineGag.setLogged(PublicResource.getLogged(this));
+        _nineGag.setSafemode(PublicResource.getSafeMode(this));
     }
     public void onCreateOnScreenButton(){
     	//button next
@@ -256,6 +258,9 @@ public class GagFUN extends Activity {
 			PublicResource.setPrefCurrentView(this, EntryType.TRENDING, rbV_trending.getDisplayedChild());
 			rbV_trending.DisposeAllDialog();
 		}
+		//Save Logged information
+		PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
+		PublicResource.setLogged(this, _nineGag.Logged());
 	}
 
 
@@ -293,7 +298,7 @@ public class GagFUN extends Activity {
 	private void setUpSafemode() {
 		boolean mode = PublicResource.getSafeMode(this);
 		if(mode != _nineGag.getSafeMode()){
-			_nineGag.setSafeMode(mode);
+			_nineGag.postSafeMode(mode);
 			setAllRibbonNeedToRefresh();
 			getCurrentRibbon().Reset();
 		}
