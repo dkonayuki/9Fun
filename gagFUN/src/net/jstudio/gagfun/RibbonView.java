@@ -115,6 +115,21 @@ public class RibbonView extends ViewAnimator {
         temp3.addView(btt_Like);
         temp3.addView(m_LikeNumber,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
         menuBot.addView(temp3,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+        //Share Button
+        ImageButton btt_Share = new ImageButton(this.getContext());
+        btt_Share.setImageResource(R.drawable.button_share);
+        btt_Share.setBackgroundColor(Color.TRANSPARENT);
+        btt_Share.setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				FBCmtDialog = new CommentDialog(getContext(), 
+						getCurrentEntry().getFBCommentLink());
+		    	int[] pos = {0, 0};
+		    	v.getLocationOnScreen(pos);
+		    	FBCmtDialog.setPosition(pos[0] + v.getWidth()/2, pos[1] + v.getHeight()/2);
+		    	FBCmtDialog.show();
+				
+			}        	
+        });
         //Comment Button
         ImageButton btt_Comment = new ImageButton(this.getContext());
         btt_Comment.setImageResource(R.drawable.button_comment);
@@ -131,7 +146,9 @@ public class RibbonView extends ViewAnimator {
 			}        	
         });
         LinearLayout temp2= new LinearLayout(this.getContext());
+        temp2.addView(btt_Share,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
         temp2.addView(btt_Comment,new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+       
         temp2.setOrientation(LinearLayout.HORIZONTAL);
         
         temp2.setGravity(Gravity.RIGHT);
