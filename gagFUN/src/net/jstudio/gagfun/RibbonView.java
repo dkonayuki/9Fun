@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.widget.ViewAnimator;
 
 public class RibbonView extends ViewAnimator {	
@@ -105,9 +106,13 @@ public class RibbonView extends ViewAnimator {
         menuBot.setOrientation(LinearLayout.HORIZONTAL);
         //Like Button
         LinearLayout temp3= new LinearLayout(this.getContext());
-        ImageButton btt_Like = new ImageButton(this.getContext());
-        btt_Like.setImageResource(R.drawable.button_like);
-        btt_Like.setBackgroundColor(Color.TRANSPARENT);
+        ToggleButton btt_Like = new ToggleButton(this.getContext());
+        btt_Like.setText("");
+        btt_Like.setTextOff("");
+        btt_Like.setTextOn("");
+        btt_Like.setBackgroundResource(R.drawable.button_like_bg);
+    
+        //btt_Like.setBackgroundColor(Color.TRANSPARENT);
         m_LikeNumber = new TextView(this.getContext());
         m_LikeNumber.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         m_LikeNumber.setText("--");
