@@ -33,4 +33,6 @@
 	<string name="OnlySafeModeOn">Because you did not login, you could only browse 9gag in Safe-mode.</string>
 	<string name="ShareWith">Share with</string>
 	<string name="DidNotExitRightWay">You did not exit application approriate way. Please restart it!</string>
+	<string name="CannotUseLikeButton">Please Login to use Like/UnLike button!</string>
+	<string name="Guarantee">We do not save your account/password or use for other means. Its just like your web-login.</string>
 </resources>

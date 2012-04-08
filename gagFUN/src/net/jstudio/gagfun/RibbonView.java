@@ -15,10 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ViewAnimator;
 
@@ -42,6 +45,7 @@ public class RibbonView extends ViewAnimator {
 	private boolean menu_on = false;
 	
 	private TextView m_Title, m_LikeNumber;
+	private ToggleButton btt_Like;
 	private FrameLayout layout;
 	private LinearLayout menuTop, menuBot;
 	private CommentDialog FBCmtDialog = null;
@@ -106,11 +110,40 @@ public class RibbonView extends ViewAnimator {
         menuBot.setOrientation(LinearLayout.HORIZONTAL);
         //Like Button
         LinearLayout temp3= new LinearLayout(this.getContext());
-        ToggleButton btt_Like = new ToggleButton(this.getContext());
+        btt_Like = new ToggleButton(this.getContext());
         btt_Like.setText("");
         btt_Like.setTextOff("");
         btt_Like.setTextOn("");
         btt_Like.setBackgroundResource(R.drawable.button_like_bg);
+        btt_Like.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				if(_nineGag.Logged()){
+					final GagEntry entry = getCurrentEntry();
+					GagEntry.LikeDisLikeCallback ldk = new GagEntry.LikeDisLikeCallback() {
+						public void OnLikeDisLike() {
+							entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
+								public void OnGetCallBackInt(int loves) {
+								}
+	
+								public void OnGetCallBackInfo(int loves, boolean isLiked) {
+									m_LikeNumber.setText(String.valueOf(loves));
+								}
+							});	
+						}
+					};
+					
+					if(isChecked)
+						entry.Like(ldk);
+					else
+						entry.UnLike(ldk);
+				}else{
+					Toast.makeText(getContext(), R.string.CannotUseLikeButton, Toast.LENGTH_SHORT).show();
+					buttonView.setChecked(false);
+				}
+			}
+        });
     
         //btt_Like.setBackgroundColor(Color.TRANSPARENT);
         m_LikeNumber = new TextView(this.getContext());
@@ -166,15 +199,16 @@ public class RibbonView extends ViewAnimator {
 		menu_on=true;		
 		m_Title.setText(entry.getEntryName());
 		m_LikeNumber.setText(entry.getLoveCount());
+		btt_Like.setChecked(false);
 		
 		entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
 			public void OnGetCallBackInt(int loves) {
-				m_LikeNumber.setText(String.valueOf(loves));
+				//m_LikeNumber.setText(String.valueOf(loves));
 			}
 
 			public void OnGetCallBackInfo(int loves, boolean isLiked) {
-				// TODO Auto-generated method stub
-				
+				m_LikeNumber.setText(String.valueOf(loves));
+				btt_Like.setChecked(isLiked);
 			}
 		});			
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));

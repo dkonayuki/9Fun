@@ -38,8 +38,8 @@ public class GagEntry {
 	private static final String likeapi_end = "%27&format=json";
 	private static final String fbcommentapi = "http://www.facebook.com/plugins/comments.php?href=";
 	private static final String liked_flag = "love current";
-	private static final String like_link = "/like/id/";
-	private static final String dislike_link = "/dislike/id/";
+	private static final String like_link = "http://9gag.com/vote/like/id/";
+	private static final String unlike_link = "http://9gag.com/vote/unlike/id/";
 	//
 	public GagEntry(NineGAG gag,
 			int id, 
@@ -99,19 +99,7 @@ public class GagEntry {
 
 	public void Like(LikeDisLikeCallback ldk){
 		try {
-			String request = NineGAG._sMainPage;
-			switch(_type){
-				case HOT:
-					request += "hot";
-					break;
-				case TRENDING:
-					request += "trending";
-					break;
-				case VOTE:
-					request += "vote";
-					break;
-			}
-			request += like_link + Integer.toString(_id);
+			String request = like_link + Integer.toString(_id);
 			HttpGet get = _gag.getHttpGet(request);
 			_gag.getHttpClient().execute(get);
 			if(ldk != null)
@@ -121,21 +109,9 @@ public class GagEntry {
 		}
 	}
 	
-	public void DisLike(LikeDisLikeCallback ldk){
+	public void UnLike(LikeDisLikeCallback ldk){
 		try {
-			String request = NineGAG._sMainPage;
-			switch(_type){
-				case HOT:
-					request += "hot";
-					break;
-				case TRENDING:
-					request += "trending";
-					break;
-				case VOTE:
-					request += "vote";
-					break;
-			}
-			request += dislike_link + Integer.toString(_id);
+			String request = unlike_link + Integer.toString(_id);
 			HttpGet get = _gag.getHttpGet(request);
 			_gag.getHttpClient().execute(get);
 			if(ldk != null)
@@ -199,7 +175,7 @@ public class GagEntry {
 			if(gcbLoves != null){
 				gcbLoves.OnGetCallBackInt(result.loves);
 				gcbLoves.OnGetCallBackInfo(result.loves, result.isLiked);
-				_loveCount = result.toString();
+				_loveCount = String.valueOf(result.loves);
 			}
 		}
 		
