@@ -51,7 +51,7 @@ import android.os.AsyncTask;
 
 public class NineGAG {
 	//Some constants
-	private static final String _sMainPage = "http://9gag.com/";
+	public static final String _sMainPage = "http://9gag.com/";
 	private static final String _sImg = "http://9gag.com/new/json?list=";
 	private static final String _sLogin = "https://9gag.com/login";
 	private static final String _sCheckSafeModeIsOff = "safe-mode-toggle off";
@@ -288,7 +288,7 @@ public class NineGAG {
 			String loveCount = str.substring(f1 + 1, f2);
 			if(loveCount.contains(love_count_dot))
 				loveCount = "0";
-			list_entry.add(new GagEntry(httpclient, id, name, url, link, loveCount, type));
+			list_entry.add(new GagEntry(this, id, name, url, link, loveCount, type));
 		}
 		return list_entry;
 	}
@@ -415,7 +415,7 @@ public class NineGAG {
 				JSONArray arr = new JSONArray(json.getString(EntryType.HOT.toString()).toString());
 				for(int i = 0; i < arr.length() - 1; i++){
 					JSONObject js_item = new JSONObject(arr.getString(i));
-					l_hot.add(new GagEntry(httpclient,
+					l_hot.add(new GagEntry(this,
 							js_item.getInt(DataEntry.ID.toString()),
 							js_item.getString(DataEntry.NAME.toString()),
 							js_item.getString(DataEntry.URL.toString()),
@@ -428,7 +428,7 @@ public class NineGAG {
 				arr = new JSONArray(json.getString(EntryType.TRENDING.toString()).toString());
 				for(int i = 0; i < arr.length() - 1; i++){
 					JSONObject js_item = new JSONObject(arr.getString(i));
-					l_trending.add(new GagEntry(httpclient,
+					l_trending.add(new GagEntry(this,
 							js_item.getInt(DataEntry.ID.toString()),
 							js_item.getString(DataEntry.NAME.toString()),
 							js_item.getString(DataEntry.URL.toString()),
@@ -441,7 +441,7 @@ public class NineGAG {
 				arr = new JSONArray(json.getString(EntryType.VOTE.toString()).toString());
 				for(int i = 0; i < arr.length() - 1; i++){
 					JSONObject js_item = new JSONObject(arr.getString(i));
-					l_vote.add(new GagEntry(httpclient,
+					l_vote.add(new GagEntry(this,
 							js_item.getInt(DataEntry.ID.toString()),
 							js_item.getString(DataEntry.NAME.toString()),
 							js_item.getString(DataEntry.URL.toString()),

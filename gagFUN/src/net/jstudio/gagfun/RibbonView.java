@@ -162,10 +162,14 @@ public class RibbonView extends ViewAnimator {
 		m_Title.setText(entry.getEntryName());
 		m_LikeNumber.setText(entry.getLoveCount());
 		
-		entry.getLovesRealTime(new GagEntry.GetCallback() {
-			
-			public void OnGetCallBackInt(int value) {
-				m_LikeNumber.setText(String.valueOf(value));				
+		entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
+			public void OnGetCallBackInt(int loves) {
+				m_LikeNumber.setText(String.valueOf(loves));
+			}
+
+			public void OnGetCallBackInfo(int loves, boolean isLiked) {
+				// TODO Auto-generated method stub
+				
 			}
 		});			
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));

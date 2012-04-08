@@ -1,5 +1,6 @@
 package net.jstudio.gagCore;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,7 +9,7 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 
@@ -23,22 +24,24 @@ public class GagEntry {
 	private EntryType _type;
 	private boolean _isDownloaded;
 	private Bitmap m_bmp;
-	private HttpClient _httpClient;
+	private NineGAG _gag;
 	private List<DownloadFinishedListener> dlFinishListener;
 	private DownloadImageTask dlTask;
 	
 	//Number of likes, loves
 	private GetCallback gcbLikes = null, gcbLoves = null;
 	private GetNumberOfLikesTask likesTask = null;
-	private GetNumberOfLovesTask lovesTask = null;
+	private GetEntryInfoTask infoTask = null;
 	
 	
 	private static final String likeapi_begin = "http://api.facebook.com/method/fql.query?query=select%20total_count%20from%20link_stat%20where%20url=%279";
 	private static final String likeapi_end = "%27&format=json";
 	private static final String fbcommentapi = "http://www.facebook.com/plugins/comments.php?href=";
-	
+	private static final String liked_flag = "love current";
+	private static final String like_link = "/like/id/";
+	private static final String dislike_link = "/dislike/id/";
 	//
-	public GagEntry(HttpClient client,
+	public GagEntry(NineGAG gag,
 			int id, 
 			String entryName,
 			String entryUrl,
@@ -46,7 +49,7 @@ public class GagEntry {
 			String loveCount,
 			EntryType type
 			){
-		_httpClient = client;
+		_gag = gag;
 		this._id = id;
 		this._entryName = entryName;		
 		this._entryUrl = entryUrl;this._type = type;
@@ -94,57 +97,108 @@ public class GagEntry {
 		dlFinishListener.add(dl);
 	}
 
-	public interface GetCallback{
-		public void OnGetCallBackInt(int value);
-	}
-	
-	public void getLovesRealTime(GetCallback gcb){
-		gcbLoves = gcb;
-		if(lovesTask != null && lovesTask.getStatus() == AsyncTask.Status.RUNNING){
-			lovesTask.cancel(true);
-			lovesTask = null;
+	public void Like(LikeDisLikeCallback ldk){
+		try {
+			String request = NineGAG._sMainPage;
+			switch(_type){
+				case HOT:
+					request += "hot";
+					break;
+				case TRENDING:
+					request += "trending";
+					break;
+				case VOTE:
+					request += "vote";
+					break;
+			}
+			request += like_link + Integer.toString(_id);
+			HttpGet get = _gag.getHttpGet(request);
+			_gag.getHttpClient().execute(get);
+			if(ldk != null)
+				ldk.OnLikeDisLike();
+		} catch (ClientProtocolException e) {
+		} catch (IOException e) {
 		}
-		lovesTask = new GetNumberOfLovesTask();
-		lovesTask.execute(_entryUrl, Integer.toString(_id));
 	}
 	
-	private class GetNumberOfLovesTask extends AsyncTask<String, Void, Integer>{
+	public void DisLike(LikeDisLikeCallback ldk){
+		try {
+			String request = NineGAG._sMainPage;
+			switch(_type){
+				case HOT:
+					request += "hot";
+					break;
+				case TRENDING:
+					request += "trending";
+					break;
+				case VOTE:
+					request += "vote";
+					break;
+			}
+			request += dislike_link + Integer.toString(_id);
+			HttpGet get = _gag.getHttpGet(request);
+			_gag.getHttpClient().execute(get);
+			if(ldk != null)
+				ldk.OnLikeDisLike();
+		} catch (ClientProtocolException e) {
+		} catch (IOException e) {
+		}
+	}
+	public interface GetCallback{
+		public void OnGetCallBackInt(int loves);
+		public void OnGetCallBackInfo(int loves, boolean isLiked);
+	}
+	public interface LikeDisLikeCallback{
+		public void OnLikeDisLike();
+	}
+	
+	public void getEntryInfoRealTime(GetCallback gcb){
+		if(infoTask != null && infoTask.getStatus() == AsyncTask.Status.RUNNING){
+			infoTask.cancel(true);
+			infoTask = null;
+		}
+		gcbLoves = gcb;
+		infoTask = new GetEntryInfoTask();
+		infoTask.execute(_entryUrl, Integer.toString(_id));
+	}
+	
+	private class ResultInfo{
+		public int loves;
+		public boolean isLiked;
+	}
+	private class GetEntryInfoTask extends AsyncTask<String, Void, ResultInfo>{
 
 		@Override
-		protected Integer doInBackground(String... params) {
-			Integer re = null;
+		protected ResultInfo doInBackground(String... params) {
+			ResultInfo re = new ResultInfo();
 			try{
 				String currentID = params[1];
-				HttpUriRequest request = new HttpGet(params[0]);				
-				HttpResponse response = _httpClient.execute(request);
-				HttpEntity entity = response.getEntity();
-				if(entity != null){
-					StringBuilder str_b = new StringBuilder();
-					InputStream in = entity.getContent();
-					int i;
-					while(( i = in.read()) != -1)
-						str_b.append((char)i);					
-					String str = str_b.toString();
-					//
-					String strFind = "love_count_" + currentID;
-					int f1 = str.indexOf(strFind);
-					f1 += strFind.length();
-					f1 = str.indexOf(">", f1);
-					int f2 = str.indexOf("<", f1);
-					if(str.substring(f1 + 1, f2).contains(NineGAG.love_count_dot))
-						return 0;
-					return Integer.parseInt(str.substring(f1 + 1, f2));
-				}
+				HttpGet get = _gag.getHttpGet(params[0]);
+				String str = Utilities.ReadInputHTTP(_gag.getHttpClient().execute(get));
+				//Number of loves
+				String strFind = "love_count_" + currentID;
+				int f1 = str.indexOf(strFind);
+				f1 += strFind.length();
+				f1 = str.indexOf(">", f1);
+				int f2 = str.indexOf("<", f1);
+				if(str.substring(f1 + 1, f2).contains(NineGAG.love_count_dot))
+					re.loves = 0;
+				re.loves = Integer.parseInt(str.substring(f1 + 1, f2));
+				//Is Liked
+				re.isLiked = str.contains(liked_flag);
+
 			}catch(Exception e){
-				re = Integer.parseInt(_loveCount);
+				re.loves = Integer.parseInt(_loveCount);
+				re.isLiked = false;
 			}
 			return re;
 		}
 
 		@Override     
-		protected void onPostExecute(Integer result) {
+		protected void onPostExecute(ResultInfo result) {
 			if(gcbLoves != null){
-				gcbLoves.OnGetCallBackInt(result.intValue());
+				gcbLoves.OnGetCallBackInt(result.loves);
+				gcbLoves.OnGetCallBackInfo(result.loves, result.isLiked);
 				_loveCount = result.toString();
 			}
 		}
@@ -165,7 +219,7 @@ public class GagEntry {
 			Integer re = null;
 			try{
 				HttpUriRequest request = new HttpGet(params[0]);				
-				HttpResponse response = _httpClient.execute(request);
+				HttpResponse response = _gag.getHttpClient().execute(request);
 				HttpEntity entity = response.getEntity();
 				if(entity != null){
 					StringBuilder str_b = new StringBuilder();
@@ -198,7 +252,7 @@ public class GagEntry {
 			Bitmap bitmap = null;
 			try {
 				HttpUriRequest request = new HttpGet(params[0]);				
-				HttpResponse response = _httpClient.execute(request);
+				HttpResponse response = _gag.getHttpClient().execute(request);
 
 				StatusLine statusLine = response.getStatusLine();
 				int statusCode = statusLine.getStatusCode();
