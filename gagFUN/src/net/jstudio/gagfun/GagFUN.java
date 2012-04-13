@@ -33,6 +33,8 @@ public class GagFUN extends Activity {
 	private FrameLayout layout;
 	private ImageButton btt_next,btt_previous;
 
+	private AlertDialog al_nointernet;
+	private boolean isNoInternet = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,11 +44,13 @@ public class GagFUN extends Activity {
         	builder.setMessage(R.string.InternetIsNotAvailable)
         			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
 						public void onClick(DialogInterface dialog, int which) {
+							al_nointernet.dismiss();
 							GagFUN.this.finish();							
 						}
 					});
-        	AlertDialog alert = builder.create();
-        	alert.show();
+        	al_nointernet  = builder.create();
+        	al_nointernet.show();
+        	isNoInternet = true;
         	return;
         }        
 
@@ -289,8 +293,14 @@ public class GagFUN extends Activity {
 	protected void onDestroy() {		
 		super.onDestroy();
 		if(!PublicResource.WrongExit){
-			if(_nineGag != null)
+			if(_nineGag != null){
 				_nineGag.SaveDataToStorage();
+				_nineGag.DisposeAllDialog();
+				//Save Logged information
+				PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
+				PublicResource.setExpires(this, _nineGag.getExpires());
+				PublicResource.setLogged(this, _nineGag.Logged());
+			}
 			if(rbV_hot != null){
 				PublicResource.setPrefCurrentView(this, EntryType.HOT, rbV_hot.getDisplayedChild());
 				rbV_hot.DisposeAllDialog();
@@ -303,27 +313,29 @@ public class GagFUN extends Activity {
 				PublicResource.setPrefCurrentView(this, EntryType.VOTE, rbV_vote.getDisplayedChild());
 				rbV_vote.DisposeAllDialog();
 			}
-			//Save Logged information
-			PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
-			PublicResource.setExpires(this, _nineGag.getExpires());
-			PublicResource.setLogged(this, _nineGag.Logged());
+
 		}
 	}
 
 
 	@Override
 	protected void onResume() {
+		super.onResume();
+		if(isNoInternet) return;
 		//Check internet is available
         if(!CheckIfInternetIsAvailable()){
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
         	builder.setMessage(R.string.InternetIsNotAvailable)
         			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
 						public void onClick(DialogInterface dialog, int which) {
+							al_nointernet.dismiss();
 							GagFUN.this.finish();							
 						}
 					});
-        	AlertDialog alert = builder.create();
-        	alert.show();
+        	al_nointernet = builder.create();
+        	al_nointernet.show();
+        	isNoInternet = true;
+        	return;
         }
 		
 		//Fix android bugs
@@ -339,11 +351,11 @@ public class GagFUN extends Activity {
 		setUpOnScreenButtonMode();
 		setUpSafemode();
 		
-		super.onResume();
+		
 	}
     
 	private void setUpSafemode() {
-		if(_nineGag.Logged()){
+		if(_nineGag != null && _nineGag.Logged()){
 			boolean mode = PublicResource.getSafeMode(this);
 			if(mode != _nineGag.getSafeMode()){
 				_nineGag.postSafeMode(mode);
