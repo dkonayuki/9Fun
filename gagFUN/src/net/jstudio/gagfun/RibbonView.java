@@ -53,7 +53,12 @@ public class RibbonView extends ViewAnimator {
 	public boolean NeedToRefresh = false;
 	
 	
-	private GagEntry getCurrentEntry(){return _nineGag.getList(m_type).get(getDisplayedChild());}
+	private GagEntry getCurrentEntry(){
+		if(_nineGag.getList(m_type).size() > 0)
+			return _nineGag.getList(m_type).get(getDisplayedChild());
+		return null;
+	}
+	
 	private void addNewView(GagEntry entry, boolean addToQueue){
 		entry.addDownloadFinished(new GagEntry.DownloadFinishedListener() {			
 			public void OnDownloadFinished() {
@@ -359,5 +364,10 @@ public class RibbonView extends ViewAnimator {
 	public void DisposeAllDialog(){
 		if(FBCmtDialog != null && FBCmtDialog.isShowing())
 			FBCmtDialog.dismiss();
+		
+		//Dispose Downloading Image
+		GagEntry currentEntry = getCurrentEntry();
+		if(currentEntry != null) getCurrentEntry().DisposeImage();
 	}
+	
 }

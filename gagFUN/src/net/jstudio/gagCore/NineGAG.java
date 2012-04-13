@@ -96,6 +96,12 @@ public class NineGAG {
 	public void setLogged(boolean logged){m_isLogged = logged;}
 	public void setSafemode(boolean mode){m_bSafeMode = mode;}
 	
+	public void DisposeAllDialog(){
+		if(progressDialog != null)
+			progressDialog.dismiss();
+		if(progDlgLogin != null)
+			progDlgLogin.dismiss();
+	}
 	public void postSafeMode(boolean mode){
 		try {
 			if(m_isLogged && m_bSafeMode != mode){
@@ -615,9 +621,9 @@ public class NineGAG {
 					l_hot.addAll(result);
 				if(loadFinished != null)
 					loadFinished.OnLoadFirstEntriesFinished();
-				
 				//Close Progress Dialog
 				progressDialog.dismiss();
+				
 			}else{
 				PublicResource.WrongExit = true;
 				PublicResource.ResetAllVariable(_context);
@@ -626,6 +632,10 @@ public class NineGAG {
 	        	builder.setMessage(R.string.DidNotExitRightWay)
 	        			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {						
 							public void onClick(DialogInterface dialog, int which) {
+								//Close Progress Dialog
+								progressDialog.dismiss();
+								
+								//Close activity
 								((Activity)_context).finish();		
 							}
 						});
