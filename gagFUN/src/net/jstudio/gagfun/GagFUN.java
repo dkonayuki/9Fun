@@ -78,6 +78,7 @@ public class GagFUN extends Activity {
         }    
         //Load previous Logged information
         _nineGag.setPHPSESSID(PublicResource.getPHPSESSID(this));
+        _nineGag.setExpires(PublicResource.getExpires(this));
         _nineGag.setLogged(PublicResource.getLogged(this));
         _nineGag.setSafemode(PublicResource.getSafeMode(this));
     }
@@ -304,6 +305,7 @@ public class GagFUN extends Activity {
 			}
 			//Save Logged information
 			PublicResource.setPHPSESSID(this, _nineGag.getPHPSESSID());
+			PublicResource.setExpires(this, _nineGag.getExpires());
 			PublicResource.setLogged(this, _nineGag.Logged());
 		}
 	}

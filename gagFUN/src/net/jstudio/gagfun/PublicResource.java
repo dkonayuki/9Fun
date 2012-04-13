@@ -50,6 +50,7 @@ public class PublicResource {
 	private static final String sCurrent_VOTE = "CurrentVOTE";
 	private static final String sCurrent_Page = "CurrentPage";
 	private static final String sPHPSESSID = "PHPSESSID";
+	private static final String sExpires = "Expires";
 	private static final String sLogged = "Logged";
 	private static final String sTouchMode = "touchMode";
 	public static final String sSafeMode = "safeMode";
@@ -103,6 +104,11 @@ public class PublicResource {
 		return pref.getBoolean(sLogged, false);
 	}
 	
+	public static String getExpires(Context ct){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		return pref.getString(sExpires, "");
+	}
+	
 	public static void setPHPSESSID(Context ct, String str){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = pref.edit();
@@ -116,6 +122,14 @@ public class PublicResource {
 		editor.putBoolean(sLogged, value);
 		editor.commit();
 	}
+	
+	public static void setExpires(Context ct, String str){
+		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putString(sExpires, str);
+		editor.commit();
+	}
+	
 	public static void setPrefCurrentView(Context ct, EntryType type, int value){
 		SharedPreferences pref = ct.getSharedPreferences(sPrefName, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = pref.edit();

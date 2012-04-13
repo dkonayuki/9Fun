@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -49,6 +52,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 
+
 public class NineGAG {
 	//Some constants
 	public static final String _sMainPage = "http://9gag.com/";
@@ -58,6 +62,8 @@ public class NineGAG {
 	private static final int _iUpdate = 5;
 	private static final String _sSavedFileName = "saved";
 	private static final String _sPHPSESS_Cookie = "PHPSESSID";
+	private static final String _sExpires_Cookie = "expires";
+	private static final String _sExpires_Cookie_Format = "EEE, dd-MMM-yyyy hh:mm:ss z";
 	private static final String _sSafeModeLink = "http://9gag.com/pref/safe-browse?enable=";
 	private static final String _sLogout = "http://9gag.com/logout";
 	public static final String love_count_dot = "bull";
@@ -74,7 +80,7 @@ public class NineGAG {
 	private ProgressDialog progressDialog, progDlgLogin;
 	private Context _context;
 	private boolean m_isLogged = false, m_bSafeMode = true;
-	private String m_sPHPSESSID;
+	private String m_sPHPSESSID, m_sExpires;
 	
 	public List<GagEntry> getListHot(){return l_hot;}
 	public List<GagEntry> getListdiscover(){return l_discover;}
@@ -85,6 +91,8 @@ public class NineGAG {
 	public boolean getSafeMode(){return m_bSafeMode;}
 	public String getPHPSESSID(){return m_sPHPSESSID;}
 	public void setPHPSESSID(String str){m_sPHPSESSID = str;}
+	public String getExpires(){return m_sExpires;}
+	public void setExpires(String str){m_sExpires = str;}
 	public void setLogged(boolean logged){m_isLogged = logged;}
 	public void setSafemode(boolean mode){m_bSafeMode = mode;}
 	
@@ -460,18 +468,26 @@ public class NineGAG {
 		return true;
 	}
 	
-	public HttpGet getHttpGet(String sLink){
+	public HttpGet getHttpGet(String sLink) {
 		HttpGet get = new HttpGet(sLink);
 		if(m_isLogged){
 			//Set cookie
 			int f1 = m_sPHPSESSID.indexOf("=");
 	        int f2 = m_sPHPSESSID.length();
-			Cookie newCookie = new BasicClientCookie(_sPHPSESS_Cookie, m_sPHPSESSID.substring(f1 + 1, f2));
+	        BasicClientCookie newCookie = new BasicClientCookie(_sPHPSESS_Cookie, m_sPHPSESSID.substring(f1 + 1, f2));
+	        //Expires
+	        f1 = m_sExpires.indexOf("=");
+	        f2 = m_sExpires.length();
+	        SimpleDateFormat df = new SimpleDateFormat(_sExpires_Cookie_Format);
+			try {
+				newCookie.setExpiryDate(df.parse(m_sExpires.substring(f1 + 1, f2)));
+			} catch (ParseException e) {
+			}
 			CookieStore store = new BasicCookieStore();
 		    store.addCookie(newCookie);
 		    httpclient.setCookieStore(store);
 		    
-			get.setHeader("Cookie", m_sPHPSESSID);
+			get.setHeader("Cookie", m_sPHPSESSID + "; " + m_sExpires + ";");
 		}
 		return get;
 	}
@@ -526,6 +542,10 @@ public class NineGAG {
 					f1 = sCookie.indexOf("=");
 			        f2 = sCookie.indexOf(";", f1);
 					re.PHPSESSID = _sPHPSESS_Cookie + "=" + sCookie.substring(f1 + 1, f2);
+					//Expires of this session
+					f1 = sCookie.indexOf("=", f2);
+					f2 = sCookie.indexOf(";", f1);
+					re.Expires = _sExpires_Cookie + "=" + sCookie.substring(f1 + 1, f2);
 					//Set cookie
 					Cookie newCookie = new BasicClientCookie(_sPHPSESS_Cookie, sCookie.substring(f1 + 1, f2));
 					CookieStore store = new BasicCookieStore();
@@ -553,6 +573,7 @@ public class NineGAG {
 			m_bSafeMode = result.SafeMode;
 			PublicResource.setSafeMode(_context, m_bSafeMode);
 			m_sPHPSESSID = result.PHPSESSID;
+			m_sExpires = result.Expires;
 			progDlgLogin.dismiss();
 			if(lsPLFinished != null)
 				lsPLFinished.OnProcessLoginFinished(m_isLogged, m_bSafeMode);
@@ -566,6 +587,7 @@ public class NineGAG {
 		public boolean Success = false;
 		public boolean SafeMode = true;
 		public String PHPSESSID;
+		public String Expires;
 	}
 	
 	private class LoadFirstEntriesTask extends AsyncTask<EntryType, Void, List<GagEntry>>{
