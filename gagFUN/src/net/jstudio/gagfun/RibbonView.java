@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -120,34 +119,40 @@ public class RibbonView extends ViewAnimator {
         btt_Like.setTextOff("");
         btt_Like.setTextOn("");
         btt_Like.setBackgroundResource(R.drawable.button_like_bg);
-        btt_Like.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+        btt_Like.setOnClickListener(new OnClickListener(){
 
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
+        	
+			public void onClick(View v) {
+				CompoundButton btt = (CompoundButton)v;
 				if(_nineGag.Logged()){
 					final GagEntry entry = getCurrentEntry();
 					GagEntry.LikeDisLikeCallback ldk = new GagEntry.LikeDisLikeCallback() {
 						public void OnLikeDisLike() {
+							
 							entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
 								public void OnGetCallBackInt(int loves) {
 								}
 	
 								public void OnGetCallBackInfo(int loves, boolean isLiked) {
 									m_LikeNumber.setText(String.valueOf(loves));
+									btt_Like.setChecked(isLiked);
 								}
-							});	
+							});
+								
 						}
 					};
 					
-					if(isChecked)
+					if(btt.isChecked())
 						entry.Like(ldk);
 					else
 						entry.UnLike(ldk);
 				}else{
 					Toast.makeText(getContext(), R.string.CannotUseLikeButton, Toast.LENGTH_SHORT).show();
-					buttonView.setChecked(false);
+					btt.setChecked(false);
 				}
+				
 			}
+			
         });
     
         //btt_Like.setBackgroundColor(Color.TRANSPARENT);
