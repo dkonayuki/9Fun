@@ -32,7 +32,7 @@
 	<string name="ShareWith">シェア</string>
 	<string name="mnuVote">投票ページ</string>
 	<string name="mnuLogout">ログアウト</string>
-	<string name="DidNotExitRightWay">You did not exit application approriate way. Please restart it!</string>
-	<string name="CannotUseLikeButton">Please Login to use Like/UnLike Button!</string>
-	<string name="Guarantee">We do not save your account/password or use for other means. Its just like your web-login.</string>
+	<string name="DidNotExitRightWay">正しく終了しなかったため、アプリ再起動お願いします。</string>
+	<string name="CannotUseLikeButton">ログインしてください。</string>
+	<string name="Guarantee">セキュリティのため、IDとパスワードの扱いはウェブ上と全く同じです。</string>
 </resources>
