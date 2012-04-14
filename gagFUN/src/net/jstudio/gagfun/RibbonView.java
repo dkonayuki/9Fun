@@ -125,10 +125,13 @@ public class RibbonView extends ViewAnimator {
 			public void onClick(View v) {
 				CompoundButton btt = (CompoundButton)v;
 				if(_nineGag.Logged()){
+					btt.setEnabled(false);
 					final GagEntry entry = getCurrentEntry();
 					GagEntry.LikeDisLikeCallback ldk = new GagEntry.LikeDisLikeCallback() {
 						public void OnLikeDisLike() {
 							
+							btt_Like.setEnabled(true);
+							/*
 							entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
 								public void OnGetCallBackInt(int loves) {
 								}
@@ -136,9 +139,10 @@ public class RibbonView extends ViewAnimator {
 								public void OnGetCallBackInfo(int loves, boolean isLiked) {
 									m_LikeNumber.setText(String.valueOf(loves));
 									btt_Like.setChecked(isLiked);
+									btt_Like.setEnabled(true);
 								}
 							});
-								
+							*/
 						}
 					};
 					
@@ -152,7 +156,6 @@ public class RibbonView extends ViewAnimator {
 				}
 				
 			}
-			
         });
     
         //btt_Like.setBackgroundColor(Color.TRANSPARENT);
@@ -210,6 +213,7 @@ public class RibbonView extends ViewAnimator {
 		m_Title.setText(entry.getEntryName());
 		m_LikeNumber.setText(entry.getLoveCount());
 		btt_Like.setChecked(false);
+		btt_Like.setEnabled(false);
 		
 		entry.getEntryInfoRealTime(new GagEntry.GetCallback() {
 			public void OnGetCallBackInt(int loves) {
@@ -219,6 +223,7 @@ public class RibbonView extends ViewAnimator {
 			public void OnGetCallBackInfo(int loves, boolean isLiked) {
 				m_LikeNumber.setText(String.valueOf(loves));
 				btt_Like.setChecked(isLiked);
+				btt_Like.setEnabled(true);
 			}
 		});			
 		((ViewGroup) this.getCurrentView()).addView(menuTop,new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT,Gravity.TOP));

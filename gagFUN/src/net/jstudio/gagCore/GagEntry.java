@@ -99,11 +99,13 @@ public class GagEntry {
 
 	public void Like(LikeDisLikeCallback ldk){
 		try {
+			
 			String request = like_link + Integer.toString(_id);
 			HttpGet get = _gag.getHttpGet(request);
 			_gag.getHttpClient().execute(get);
 			if(ldk != null)
 				ldk.OnLikeDisLike();
+
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
@@ -111,11 +113,13 @@ public class GagEntry {
 	
 	public void UnLike(LikeDisLikeCallback ldk){
 		try {
+			
 			String request = unlike_link + Integer.toString(_id);
 			HttpGet get = _gag.getHttpGet(request);
 			_gag.getHttpClient().execute(get);
 			if(ldk != null)
 				ldk.OnLikeDisLike();
+				
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
