@@ -284,9 +284,9 @@ public class NineGAG {
 			//Add get link
 			String strFind;
 			if(str.substring(0, 2).compareTo("<l") == 0) //if json data
-				strFind = "<a href=\"/gag/" + Integer.toString(id) + "\"  target=\"_blank\" ><img src=\"";
+				strFind = Integer.toString(id) + "\" class=\"\"><img src=\"";
 			else
-				strFind = "<a href=\"/gag/" + Integer.toString(id) + "\"  target=\"_blank\" >\n\t\t<img src=\"";
+				strFind = Integer.toString(id) + "\" class=\"\">\n\t\t\t<img src=\"";
 			int f1 = str.indexOf(strFind);
 			f1 += strFind.length();
 			int f2 = str.indexOf("\"", f1);			
